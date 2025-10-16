@@ -1,0 +1,130 @@
+<?php
+
+    // --- CONSTANTS ---
+    define("PFP", __DIR__ . "/../content/profiles/");
+    define("POST", __DIR__ . "/../content/posts/");
+    define("ACCEPTED_FILES", ["jpg", "jpeg", "png", "webp", "gif", "webm", "mp4", "mov"]);
+    define("ACCEPTED_PFP", ["jpg", "jpeg", "png", "webp"]);
+    // --- CONSTANTS END ---
+
+    function CheckPageAccess(): void {
+        // what pages the visitors can access
+        $page_access_visitor = [
+            "/login/index.php",
+            "/login/regform.php",
+            "/login/success.php",
+            "/password/email.php",
+            "/password/process.php",
+            "/password/confirm.php",
+            "/password/reset.php",
+            "password/success.php",
+            "logout.php"
+        ];
+        // what pages users can access
+        $page_access_user = [
+            "/dashboard/index.php",
+            "/dashboard/options.php",
+            "/dashboard/profile.php"
+        ];
+        
+
+    }
+
+    function Error(string $error, string $message): void {
+        // tests if an error of '$error' exists from GET and outputs the specified message 
+        if (isset($_GET["error"]) && $_GET["error"] == $error) {
+            echo "<span class=\"error\">" . htmlspecialchars($message, ENT_QUOTES, "UTF-8") . "</span>";
+        }
+    }
+
+    function DBSesh(): mysqli | null {
+        // creates a db session id for accessing dbconnect.php
+        $_SESSION["dbconnect"] = true;
+
+        // start session
+        StartSesh();
+        // if the user tried to start a connection with the database illegally
+        if (!isset($_SESSION["dbconnect"])) {
+            header("Location: /login/index.php");
+            exit();
+        }
+        // unset for next db request
+        unset($_SESSION["dbconnect"]);
+        // try create a connection to mysqli
+        try {
+            $conn = mysqli_connect("localhost", "root", "", "dbconnect");
+        } catch (mysqli_sql_exception) {
+            // out errors to page
+            exit("Error: Could not establish a connection with the database");
+        }
+        return $conn;
+    }
+
+    function StartSesh(): void {
+        // checks if a session already exists and creates one if it doesnt
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+    }
+
+    function CheckQueryResult(mysqli_result | bool $result, mysqli_stmt | bool $statement, mysqli | bool $connection, string $message): void {
+        // checks if a queried result exists, if NOT frees resources and redirects to the desired page
+        if ($result->num_rows < 1) {
+            $statement->close();
+            $result->free();
+            mysqli_close($connection);
+            header("Location: $message");
+            exit();
+        }
+    }
+
+    function CheckNoQueryResult(mysqli_result | bool $result, mysqli_stmt | bool $statement, mysqli | bool $connection, string $message): void {
+        // checks if a queried result DOES NOT EXIST, if it does exist frees resources and redirects to the desired page
+        if ($result->num_rows > 0) {
+            $statement->close();
+            $result->free();
+            mysqli_close($connection);
+            header("Location: $message");
+            exit();
+        }
+    }
+
+    function CheckChangeFail(mysqli_stmt | bool $statement, mysqli | bool $connection, string $message): void {
+        // checks if insertion OR update to the database has failed
+        if ($statement->affected_rows < 1) {
+            $statement->close();
+            mysqli_close($connection);
+            if ($message != "None") {
+                header("Location: " . $message);
+                exit();
+            }
+        }
+    }
+
+    function PrintHeader(): void {
+        // outputs the content of header.php to the page
+        include_once("../includes/header.php");
+    }
+
+    function IsLoggedIn(): bool {
+        // returns true or false based on if the users id has been set in session
+        return isset($_SESSION["UserID"]);
+    }
+
+    function CheckLogIn(): void {
+        // checks if the user has previously logged in, if so redirects them to the dashboard
+        if (IsLoggedIn()) {
+            header("Location: /dashboard/");
+            exit();
+        }
+    }
+
+    function CheckNotLoggedIn(): void {
+        // checks if the user is not logged in, if so redirects them to the login page
+        if (!IsLoggedIn()) {
+            header("Location: /login/");
+            exit();
+        }
+    }
+
+?>

@@ -5,8 +5,8 @@
 - Unauthorized page access managed by users with session states and header tracking for displayed pages
 
 ## File Structure
-- All files fall under the "htdocs" directory in a XAMPP installation for ease of use.
-- This obviously makes private files and directories more unsafe and easier to access through domain/dir
+- All files fall under the "htdocs" directory in a XAMPP installation for ease of use
+- This obviously makes private files and directories more unsafe and easier to access through domain/dir, such as the 'content' directory
 - I did it this way to make it easier to manage the files and for testing purposes on the invigilators end
 
 ## Security Concerns
@@ -40,6 +40,11 @@
         - | CreateTime | datetime - current_timestamp - not null
         - | Likes | int - not null
 
+    ### tblLikes - Stores each like for a specific post
+        - | LikeID | PK -int - auto_inc - not null
+        - | UserID | FK - int - not null
+        - | PostID | FK - int - not null
+
     ### tblMessages - Stores private message information
         - | MessageID | PK - int - auto_inc - not null
         - | SenderID | FK - int - not null
@@ -51,7 +56,7 @@
     - Images that can be uploaded, are stored as relative file names
     - The images are not stored within the database in order to focus on efficiency & database security
     - Passwords are hashed before storage, using the standard hashing algorithm SHA256
-    - MySQL database storage, connection using mysqli in PHP
+    - MySQL database storage, connection using mysqli in PHP, management in phpmyadmin
 
 ## Landing Page
 - Redirects users to the Log In page or Dashboard relative to their session ID

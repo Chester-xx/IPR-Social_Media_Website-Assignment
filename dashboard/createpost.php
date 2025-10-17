@@ -1,4 +1,5 @@
 <?php
+    echo $_SERVER["HTTP_REFERER"];
     include_once("../includes/functions.php");
     StartSesh();
     CheckNotLoggedIn();
@@ -11,7 +12,7 @@
         $name = null;
 
         if (empty($text)) {
-            header("Location: /dashboard/?error=notext");
+            header("Location: " . $_SERVER["HTTP_REFERER"] . "?error=notext");
             exit();
         }
 
@@ -59,7 +60,7 @@
         $stmt->close();
         mysqli_close($conn);
 
-        header("Location: /dashboard/");
+        header("Location: " . $_SERVER["HTTP_REFERER"]);
         exit();
 
     } else {

@@ -30,10 +30,13 @@
 
     }
 
-    function Error(string $error, string $message): void {
-        // tests if an error of '$error' exists from GET and outputs the specified message 
+    function Error(string $error, string $message, bool $pure_text = false): void {
+        // tests if an error of '$error' exists from GET and outputs the specified message
+        // if pure_text is specified to true, the error message will not be formated but printed as a pure string
+        // this makes it easier for me to print errors to inputs like textarea
         if (isset($_GET["error"]) && $_GET["error"] == $error) {
-            echo "<span class=\"error\">" . htmlspecialchars($message, ENT_QUOTES, "UTF-8") . "</span>";
+            if ($pure_text) { echo(htmlspecialchars($message, ENT_QUOTES, "UTF-8")); }
+            else { echo("<span class=\"error\">" . htmlspecialchars($message, ENT_QUOTES, "UTF-8") . "</span>"); }
         }
     }
 

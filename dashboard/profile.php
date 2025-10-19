@@ -2,29 +2,25 @@
     include_once("../includes/functions.php");
     StartSesh();
     CheckNotLoggedIn();
-
     // NEED TO ALLOW GET WITH RESPECT TO USERNAME AND THEN OVERWRITE UID WITH THE USERNAMES UserID
     $uid = $_SESSION["UserID"];
-
-    $conn = DBSesh();
-
-    $stmt = $conn->prepare("Select * From `tblUsers` Where `UserID` = ?");
-    $stmt->bind_param("i", $_SESSION["UserID"]);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    CheckQueryResult($result, $stmt, $conn, "/dashboard/profile.php?error=dbfail");
-
+    // Get user info from db
+    $result = RunQuery(
+        null,
+        "Select * From `tblUsers` Where `UserID` = ?",
+        "Query",
+        "/dashboard/profile.php?error=dbfail",
+        "i",
+        $_SESSION["UserID"]
+    );
+    // Get path
     $data = $result->fetch_assoc();
     $path = "../content/profiles/" . $data["PFP"];
-
+    // Check if users profile photo actually exists
     if (!file_exists(__DIR__ . "/../content/profiles/" . $data["PFP"])) {
         $path = "../content/profiles/default.jpg";
     }
-
     $result->free();
-    $stmt->close();
-    mysqli_close($conn);
 ?>
 
 <!DOCTYPE html>

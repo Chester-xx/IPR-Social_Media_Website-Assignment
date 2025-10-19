@@ -2,24 +2,23 @@
     include_once("../includes/functions.php");
     StartSesh();
     CheckNotLoggedIn();
-    $conn = DBSesh();
-    // Get profile image name
-    $stmt = $conn->prepare("Select `PFP` From `tblUsers` Where `UserID` = ?");
-    $stmt->bind_param("i", $_SESSION["UserID"]);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    CheckQueryResult($result, $stmt, $conn, "/dashboard/error.php?error=dbfail");
-    // create web path for loading into src
+    // Get profile photo name
+    $result = RunQuery(
+        null,
+        "Select `PFP` From `tblUsers` Where `UserID` = ?",
+        "Query",
+        "/dashboard/error.php?error=dbfail",
+        "i",
+        $_SESSION["UserID"]
+    );
+    // Create web path for loading into src
     $data = $result->fetch_assoc();
     $path = "../content/profiles/" . $data["PFP"];
-    // check if the file exists, otherwise display default
+    // Check if the file exists, otherwise display default
     if (!file_exists(__DIR__ . "/../content/profiles/" . $data["PFP"])) {
         $path = "../content/profiles/default.jpg";
     }
-    // close memory objects
     $result->free();
-    $stmt->close();
-    mysqli_close($conn);
 ?>
 
 <!DOCTYPE html>

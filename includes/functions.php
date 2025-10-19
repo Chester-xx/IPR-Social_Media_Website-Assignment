@@ -71,31 +71,57 @@ use Dba\Connection;
     }
 
     // NBNBNBNBN!!!
-    function RunQuery(string $Query, string $VariableTypes = "", mixed ...$Variables): mysqli_result | int {
-        $connection = DBSesh();
-        // connection failed
-        if (!$connection) throw new Exception("Failed to connect to the database", 503);
-        // prepare statement between db and API
-        $stmt = $connection->prepare($Query);
-        // failed query preperation
-        if (!$stmt) throw new Exception("Failed to prepare query:" . $connection->error, $connection->errno);
-        // check if the query has parameters -> bind them
-        if ($VariableTypes !== "") $stmt->bind_param($VariableTypes, ...$Variables);
-        // check execution success
-        if (!$stmt->execute()) throw new Exception("Query execution failed: " . $stmt->error, $stmt->errno);
-        // check if the query is a select statement
-        $selectstmt = stripos(strtolower(trim($Query)), "select") === 0;
-        // if its a select query, return mysqli_result, otherwise return int affected rows
-        $result = $selectstmt ? $stmt->get_result() : $stmt->affected_rows;
-        // check if the result failed
-        if ($selectstmt && $result === false) throw new Exception("Failed to fetch result: " . $stmt->error, $stmt->errno);
-        // close statement and connection - leave result, we dont run $result->free()
-        $stmt->close();
-        $connection->close();
-        return $result;
-
-        // a call will look like this:
-        // try { $result = RunQuery() } catch (Exception $e) { Error("path", $e->getMessage()) }
+    function RunQuery(mysqli | null $conn = null, string $Query, string $ExpectedResult, string $Redirector, string $VariableTypes = "", mixed ...$Variables): mysqli_result | int | array {
+        // $ExpectedResult - Refers to how the query is expected to behave
+        // Meaning, does it change the database (insert, delete, update) ? OR do we expect no result to be returned or atleast one result (select) 
+        try {
+            if ($conn !== null) {
+                $connection = $conn;
+                $closeconn = false;
+            } else {
+                $connection = DBSesh();
+                $closeconn = true;
+            }
+            // connection failed
+            if (!$connection) throw new Exception("Failed to connect to the database", 503);
+            // prepare statement between db and API
+            $stmt = $connection->prepare($Query);
+            // failed query preperation
+            if (!$stmt) throw new Exception("Failed to prepare query:" . $connection->error, $connection->errno);
+            // check if the query has parameters -> bind them
+            if ($VariableTypes !== "") $stmt->bind_param($VariableTypes, ...$Variables);
+            // check execution success
+            if (!$stmt->execute()) throw new Exception("Query execution failed: " . $stmt->error, $stmt->errno);
+            // check if the query is a select statement
+            $selectstmt = stripos(strtolower(trim($Query)), "select") === 0;
+            // if its a select query, return mysqli_result, otherwise return int affected rows
+            $result = $selectstmt ? $stmt->get_result() : $stmt->affected_rows;
+            // check if the result failed
+            if ($selectstmt && $result === false) throw new Exception("Failed to fetch result: " . $stmt->error, $stmt->errno);
+            // Run checks on query results or statements
+            switch (strtolower($ExpectedResult)) {
+                case "query":
+                    CheckQueryResult($result, $stmt, $connection, $Redirector);
+                    break;
+                case "noquery":
+                    CheckNoQueryResult($result, $stmt, $connection, $Redirector);
+                    break;
+                case "change":
+                    CheckChangeFail($stmt, $connection, $Redirector);
+                    break;
+                case "none":
+                    // custom checks like in process.php
+                    break;
+                default:
+                    throw new Exception("Non query check present or null", 1);
+            }
+            // close statement and connection - leave result, we dont run $result->free()
+            $stmt->close();
+            if ($closeconn) $connection->close();
+            return $result;
+        } catch (Exception $e) {
+            return ["message" => $e->getMessage(), "errno" => $e->getCode()];
+        }
     }
 
     function CheckQueryResult(mysqli_result | bool $result, mysqli_stmt | bool $statement, mysqli | bool $connection, string $message): void {

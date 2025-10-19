@@ -26,23 +26,20 @@
     </div>
     <!-- Getting expiry time -->
     <?php
-        // inp + sanitize
+        // Inp + sanitize
         $res = trim(filter_input(INPUT_GET, "reset", FILTER_SANITIZE_NUMBER_INT));
-
-        $conn = DBSesh();
-        
-        // get expr time from db
-        $stmt = $conn->prepare("Select `Expires` From `tblPasswordResets` Where `ResetID` = ?");
-        $stmt->bind_param("i", $res);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        
-        CheckQueryResult($result, $stmt, $conn, "/password/email.php?error=dbfail");
-        
-        // get time - fetch from db, get remaining time by subtracting current from expiry
+        // Fetch timestamp from db
+        $result = RunQuery(
+            null,
+            "Select `Expires` From `tblPasswordResets` Where `ResetID` = ?",
+            "Query",
+            "/password/email.php?error=dbfail",
+            "i",
+            $res
+        );
+        // Calc remaining time by subtracting current from expiry
         $expr = strtotime($result->fetch_assoc()["Expires"]) - time();
         if ($expr < 0) $expr = 0;
-
     ?>
     <!-- Countdown from 5 minutes -->
     <script>

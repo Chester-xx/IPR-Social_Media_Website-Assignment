@@ -7,7 +7,7 @@
         header("Location: /login/index.php");
         exit();
     }
-
+    // Post method and button clicked
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["enter"])) {
         // check if a file was uploaded
         if (isset($_FILES["reg_pfp"]) && $_FILES["reg_pfp"]["error"] !== UPLOAD_ERR_NO_FILE) {
@@ -39,20 +39,17 @@
                  header("Location: /login/success.php?id=" . $_GET["id"] . "&error=file");
                 exit();
             }
-            // start a database session
-            $conn = DBSesh();
-            // update users profile photo file name
-            $stmt = $conn->prepare("Update `tblUsers` Set `PFP` = ? Where `UserID` = ?");
-            $stmt->bind_param("si", $name, $uid);
-            $stmt->execute();
-            // check affected rows
-            CheckChangeFail($stmt, $conn, "/login/success.php?id=" . $_GET["id"] . "&error=dbfail");
-            // close statement and connection
-            $stmt->close();
-            mysqli_close($conn);
+            // Update users pfp file name in db
+            $tmp = RunQuery(
+                null,
+                "Update `tblUsers` Set `PFP` = ? Where `UserID` = ?",
+                "Change",
+                "/login/success.php?id=" . $_GET["id"] . "&error=dbfail",
+                "si",
+                $name, $uid
+            );
         }
-        // no image was uploaded so just proceed
-        // there is a default.jpg string for each new user account
+        // no image was uploaded so just proceed - there is a default.jpg string for each new user account
         unset($_SESSION["acc_created"]);
         header("Location: /login/");
         exit();

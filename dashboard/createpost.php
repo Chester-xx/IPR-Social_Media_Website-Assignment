@@ -16,11 +16,6 @@
             exit();
         }
 
-        echo "<pre>";
-        print_r($_FILES);
-        echo "</pre>";
-        // exit();
-
         if (isset($_FILES["post_img"]) && $_FILES["post_img"]["error"] !== UPLOAD_ERR_NO_FILE) {
             $file = $_FILES["post_img"];
 
@@ -50,15 +45,14 @@
             }
         }
 
-        $conn = DBSesh();
-        $stmt = $conn->prepare("Insert Into `tblPosts` (`UserID`, `Content`, `Image`) Values (?, ?, ?)");
-        $stmt->bind_param("iss", $uid, $text, $name);
-        $stmt->execute();
-
-        CheckChangeFail($stmt, $conn, "/dashboard/error.php?error=dbfail");
-
-        $stmt->close();
-        mysqli_close($conn);
+        $tmp = RunQuery(
+            null,
+            "Insert Into `tblPosts` (`UserID`, `Content`, `Image`) Values (?, ?, ?)",
+            "Change",
+            "/dashboard/error.php?error=dbfail",
+            "iss",
+            $uid, $text, $name
+        );
 
         header("Location: " . $_SERVER["HTTP_REFERER"]);
         exit();

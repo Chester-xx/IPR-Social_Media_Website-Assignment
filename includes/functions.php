@@ -67,47 +67,35 @@ use Dba\Connection;
 
     function StartSesh(): void {
         // checks if a session already exists and creates one if it doesnt
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
+        if (session_status() === PHP_SESSION_NONE) session_start();
     }
 
     // NBNBNBNBN!!!
-    function RunQuery(string $Query, string $VariableTypes, mixed ...$Variables): mysqli_result | bool {
-        
+    function RunQuery(string $Query, string $VariableTypes = "", mixed ...$Variables): mysqli_result | int {
         $connection = DBSesh();
-
-        if (!$connection) {
-            throw new Exception("Failed to connect to the database:" . $connection->error, $connection->errno);
-        }
-        
+        // connection failed
+        if (!$connection) throw new Exception("Failed to connect to the database", 503);
+        // prepare statement between db and API
         $stmt = $connection->prepare($Query);
-
-        if (!$stmt) {
-            throw new Exception("Failed to prepare query:" . $connection->error, $connection->error);
-        }
-
-        $stmt->bind_param($VariableTypes, ...$Variables);
-
-        if (!$stmt->execute()) {
-            throw new Exception("Query execution failed: " . $connection->error, $connection->error);
-        }
-
-        $result = $stmt->get_result();
-
-        // SELECT returns result, ins del update dont !!!! 
-        // $isSelect = stripos(trim($Query), 'SELECT') === 0;
-        // if ($isSelect) {
-        //     $result = $stmt->get_result();
-        // } else {
-        //     $result = $stmt->affected_rows;
-        // }
-
-        if (!$result) {
-            throw new Exception("Result failed to fetch: " . $connection->error, $connection->error);
-        }
-
+        // failed query preperation
+        if (!$stmt) throw new Exception("Failed to prepare query:" . $connection->error, $connection->errno);
+        // check if the query has parameters -> bind them
+        if ($VariableTypes !== "") $stmt->bind_param($VariableTypes, ...$Variables);
+        // check execution success
+        if (!$stmt->execute()) throw new Exception("Query execution failed: " . $stmt->error, $stmt->errno);
+        // check if the query is a select statement
+        $selectstmt = stripos(strtolower(trim($Query)), "select") === 0;
+        // if its a select query, return mysqli_result, otherwise return int affected rows
+        $result = $selectstmt ? $stmt->get_result() : $stmt->affected_rows;
+        // check if the result failed
+        if ($selectstmt && $result === false) throw new Exception("Failed to fetch result: " . $stmt->error, $stmt->errno);
+        // close statement and connection - leave result, we dont run $result->free()
+        $stmt->close();
+        $connection->close();
         return $result;
+
+        // a call will look like this:
+        // try { $result = RunQuery() } catch (Exception $e) { Error("path", $e->getMessage()) }
     }
 
     function CheckQueryResult(mysqli_result | bool $result, mysqli_stmt | bool $statement, mysqli | bool $connection, string $message): void {

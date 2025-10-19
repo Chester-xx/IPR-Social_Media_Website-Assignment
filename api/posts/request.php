@@ -15,7 +15,7 @@
         $offset = isset($_GET["offset"]) ? intval($_GET["offset"]) : 0;
         $stmt = $conn->prepare("Select u.Username, u.PFP, p.Content, p.Image, p.CreateTime From tblPosts p Join tblUsers u On p.UserID = u.UserID Order By p.PostID Desc Limit ? Offset ?");
         // failed to prep qry
-        if (!$stmt) throw new Exception("Connection preperation failed: " . $conn->error);
+        if (!$stmt) throw new Exception("Failed to prepare query: " . $conn->error);
         $stmt->bind_param("ii", $loadlimit, $offset);
         // failed to bind and exec qry
         if (!$stmt->execute()) throw new Exception("Query execution failed: " . $conn->error);

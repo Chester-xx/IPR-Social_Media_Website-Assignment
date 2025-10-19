@@ -1,5 +1,7 @@
 <?php
 
+use Dba\Connection;
+
     // --- CONSTANTS ---
     define("PFP", __DIR__ . "/../content/profiles/");
     define("POST", __DIR__ . "/../content/posts/");
@@ -68,6 +70,44 @@
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
+    }
+
+    // NBNBNBNBN!!!
+    function RunQuery(string $Query, string $VariableTypes, mixed ...$Variables): mysqli_result | bool {
+        
+        $connection = DBSesh();
+
+        if (!$connection) {
+            throw new Exception("Failed to connect to the database:" . $connection->error, $connection->errno);
+        }
+        
+        $stmt = $connection->prepare($Query);
+
+        if (!$stmt) {
+            throw new Exception("Failed to prepare query:" . $connection->error, $connection->error);
+        }
+
+        $stmt->bind_param($VariableTypes, ...$Variables);
+
+        if (!$stmt->execute()) {
+            throw new Exception("Query execution failed: " . $connection->error, $connection->error);
+        }
+
+        $result = $stmt->get_result();
+
+        // SELECT returns result, ins del update dont !!!! 
+        // $isSelect = stripos(trim($Query), 'SELECT') === 0;
+        // if ($isSelect) {
+        //     $result = $stmt->get_result();
+        // } else {
+        //     $result = $stmt->affected_rows;
+        // }
+
+        if (!$result) {
+            throw new Exception("Result failed to fetch: " . $connection->error, $connection->error);
+        }
+
+        return $result;
     }
 
     function CheckQueryResult(mysqli_result | bool $result, mysqli_stmt | bool $statement, mysqli | bool $connection, string $message): void {

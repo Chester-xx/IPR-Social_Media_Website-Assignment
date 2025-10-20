@@ -19,7 +19,7 @@
         $loadlimit, $offset
     );
     // check for exceptions
-    if (CatchDBError($result, true)) {
+    if ((is_array($result) && array_key_exists("error", $result) && CatchDBError($result, true))) {
         // response 500 refers to a server side http response code, access failure
         http_response_code(500);
         // send failed request as a json with the errors
@@ -38,7 +38,7 @@
             } else {
                 $safe[$key] = $value;
             }
-        }
+        }   
         $list[] = $safe;
     }
     // send data - count < loadlimit means theres no more posts

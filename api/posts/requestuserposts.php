@@ -24,7 +24,7 @@
         );
     }
     // catch exceptions
-    if (CatchDBError($result, true) || $BadReq) {
+    if ((is_array($result) && array_key_exists("error", $result) && CatchDBError($result, true)) || $BadReq) {
         // response 500 refers to a server side http response code, access failure
         http_response_code($BadReq ? 400 : 500);
         // send failed request as a json with the errors

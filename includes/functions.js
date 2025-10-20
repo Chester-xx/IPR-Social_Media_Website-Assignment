@@ -93,13 +93,36 @@ async function GetNewPosts(APICALL, uid = null) {
                 </div>
                 <div class="row" style="justify-content: space-between; align-items: center; margin-top: 0.5rem;">
                     <div style="display: flex; align-items: center; gap: 1rem;">
-                        <img id="like-${post.PostID}" src="../content/assets/like.png" alt="Like" class="ico" style="width: 1.8rem;">
+                        <img id="like-${post.PostID}" src="../content/assets/liked.png" alt="Like" class="ico" style="width: 1.8rem;">
                         <img id="comment-${post.PostID}" src="../content/assets/comment.png" alt="Comment" class="ico" style="width: 1.8rem;">
                     </div>
                     <small>${time}</small>
                 </div>
             `;
             box.appendChild(div);
+            div.addEventListener("dblclick", async () => {
+                try {
+                    // send to PHP $_POST
+                    const form = new FormData();
+                    form.append("PostID", post.PostID);
+                    const response = await fetch(`/api/posts/like.php`, {
+                        method: "POST",
+                        body: form
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        if (data.liked) {
+                            like.src = "../content/assets/liked.png";
+                        } else {
+                            like.src = "../content/assets/unliked.png";
+                        }
+                    } else {
+                        console.error(data.error.message, ", Code: ", data.error.code);
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            });
             
             const like = document.getElementById(`like-${post.PostID}`);
             like.addEventListener("click", async () => {
@@ -113,7 +136,11 @@ async function GetNewPosts(APICALL, uid = null) {
                     });
                     const data = await response.json();
                     if (data.success) {
-                        like.classList.add("liked");
+                        if (data.liked) {
+                            like.src = "../content/assets/liked.png";
+                        } else {
+                            like.src = "../content/assets/unliked.png";
+                        }
                     } else {
                         console.error(data.error.message, ", Code: ", data.error.code);
                     }

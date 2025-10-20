@@ -102,7 +102,6 @@
         let loading = false;
         let cont = true;
         const loadlimit = 10;
-
         // --- Event Bindings ---
         // Clicks for each file upload action
         const actions = ["post_upload_image", "post_upload_gif", "post_upload_video"];

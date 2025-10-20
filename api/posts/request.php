@@ -12,7 +12,7 @@
     // Get posts from offset for some limit defined
     $result = RunQuery(
         null,
-        "Select u.Username, u.PFP, p.Content, p.Image, p.CreateTime From tblPosts p Join tblUsers u On p.UserID = u.UserID Order By p.PostID Desc Limit ? Offset ?",
+        "Select u.Username, u.PFP, p.Content, p.Image, p.CreateTime, p.PostID From tblPosts p Join tblUsers u On p.UserID = u.UserID Order By p.PostID Desc Limit ? Offset ?",
         "None",
         "",
         "ii",

@@ -2,8 +2,12 @@
     include_once("../includes/functions.php");
     StartSesh();
     CheckNotLoggedIn();
+    
+    
     // NEED TO ALLOW GET WITH RESPECT TO USERNAME AND THEN OVERWRITE UID WITH THE USERNAMES UserID
     $uid = $_SESSION["UserID"];
+    // jsvar - user = the actual user, and uid = the account being looked at
+    
     // Get user info from db
     $result = RunQuery(
         null,

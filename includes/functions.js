@@ -61,6 +61,7 @@ async function GetNewPosts(APICALL, uid = null) {
         data.posts.forEach(post => {
             const div = document.createElement("div");
             div.classList.add("post");
+            div.dataset.postid = post.PostID;
             let media = "";
             if (post.Image) {
                 const ext = post.Image.split(".").pop().toLowerCase();
@@ -92,13 +93,40 @@ async function GetNewPosts(APICALL, uid = null) {
                 </div>
                 <div class="row" style="justify-content: space-between; align-items: center; margin-top: 0.5rem;">
                     <div style="display: flex; align-items: center; gap: 1rem;">
-                        <img src="../content/assets/like.png" alt="Like" class="ico" style="width: 1.8rem;">
-                        <img src="../content/assets/comment.png" alt="Comment" class="ico" style="width: 1.8rem;">
+                        <img id="like-${post.PostID}" src="../content/assets/like.png" alt="Like" class="ico" style="width: 1.8rem;">
+                        <img id="comment-${post.PostID}" src="../content/assets/comment.png" alt="Comment" class="ico" style="width: 1.8rem;">
                     </div>
                     <small>${time}</small>
                 </div>
             `;
             box.appendChild(div);
+            
+            const like = document.getElementById(`like-${post.PostID}`);
+            like.addEventListener("click", async () => {
+                try {
+                    // send to PHP $_POST
+                    const form = new FormData();
+                    form.append("PostID", post.PostID);
+                    const response = await fetch(`/api/posts/like.php`, {
+                        method: "POST",
+                        body: form
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        like.classList.add("liked");
+                    } else {
+                        console.error(data.error.message, ", Code: ", data.error.code);
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            });
+
+            comment = document.getElementById(`comment-${post.PostID}`);
+            comment.addEventListener("click", async () => {
+                OpenComments(post.PostID);
+            });
+
         });
         // update the offset for next load
         offset += data.posts.length;

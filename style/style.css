@@ -136,6 +136,11 @@ body {
   .ico-btn:hover {
     transform: scale(1.1);
   }
+  .ico.liked {
+    filter: hue-rotate(330deg) saturate(2);
+    transform: scale(1.2);
+    transition: transform 0.2s ease, filter 0.2s ease;
+  }
   .pfp {
     border: 2px solid #498bd6;
     border-radius: 50%;

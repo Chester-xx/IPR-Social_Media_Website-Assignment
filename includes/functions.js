@@ -50,7 +50,7 @@ async function GetNewPosts(APICALL, uid = null) {
         const data = await response.json();
         // check if succession of data transmission
         if (!data.success) {
-            console.error("API Error: ", data.error);
+            console.error("API Error: ", data.error.message, data.error.code);
             document.getElementById("loading").innerText = "Error loading posts";
             loading = false;
             return;

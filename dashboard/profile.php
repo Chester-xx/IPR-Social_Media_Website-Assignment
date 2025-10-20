@@ -13,6 +13,7 @@
         "i",
         $_SESSION["UserID"]
     );
+    CatchDBError($result);
     // Get path
     $data = $result->fetch_assoc();
     $path = "../content/profiles/" . $data["PFP"];

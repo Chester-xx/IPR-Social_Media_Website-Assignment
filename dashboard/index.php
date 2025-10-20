@@ -11,6 +11,7 @@
         "i",
         $_SESSION["UserID"]
     );
+    CatchDBError($result);
     // Create web path for loading into src
     $data = $result->fetch_assoc();
     $path = "../content/profiles/" . $data["PFP"];

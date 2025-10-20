@@ -45,6 +45,7 @@
             "s",
             $email
         );
+        CatchDBError($result);
         // Get unique username for checking
         $result = $result = RunQuery(
             $conn,
@@ -54,6 +55,7 @@
             "s",
             $username
         );
+        CatchDBError($result);
         // hash password with default algo, insert into db
         $hash = password_hash($password, PASSWORD_DEFAULT);
         // insert new user data
@@ -65,6 +67,7 @@
             "ssss",
             $email, $username, $name, $hash
         );
+        CatchDBError($tmp);
         $uid = $conn->insert_id;
         // one time access flag for createsuccess.php
         $_SESSION["acc_created"] = true;

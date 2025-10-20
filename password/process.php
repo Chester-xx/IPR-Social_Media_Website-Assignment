@@ -20,6 +20,7 @@
             "s",
             $email
         );
+        CatchDBError($result);
         // no user found - custom function from ExpectedResult
         if ($result->num_rows < 1) {
             $conn->close();
@@ -41,6 +42,7 @@
             "sss",
             $email, $hash, $exp
         );
+        CatchDBError($result);
         // get the newly entered ResetID from execution
         $res = $conn->insert_id;
         $conn->close();

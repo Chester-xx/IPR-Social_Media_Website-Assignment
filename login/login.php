@@ -26,6 +26,7 @@
             "s",
             $email
         );
+        CatchDBError($result);
         // get user ID and hashed password
         $data = $result->fetch_assoc();
         $uid = $data["UserID"];

@@ -15,6 +15,7 @@
                 "i",
                 $_SESSION["uid"]
             );
+            CatchDBError($result);
             $_SESSION["email"] = $result->fetch_assoc()["Email"];
             $result = RunQuery(
                 $conn,
@@ -24,6 +25,7 @@
                 "s",
                 $_SESSION["email"]
             );
+            CatchDBError($result);
             $val = $result->fetch_assoc();
             $_SESSION["resid"] = $val["ResetID"];
             $_SESSION["hash"] = $val["Token"];
@@ -36,6 +38,7 @@
             "s",
             $_SESSION["resid"]
         );
+        CatchDBError($result);
         $db_email = $result->fetch_assoc()["Email"];
         if ((!password_verify($_SESSION["token"], $_SESSION["hash"])) || ($_SESSION["email"] != $db_email)) {
             $result->free();
@@ -74,6 +77,7 @@
             "si",
             $hash, $_SESSION["uid"]
         );
+        CatchDBError($tmp);
         $tmp = RunQuery(
             $conn,
             "Delete From `tblPasswordResets` Where `ResetID` = ?",
@@ -82,6 +86,7 @@
             "i",
             $_SESSION["resid"]
         );
+        CatchDBError($tmp);
         $conn->close();
         unset($_SESSION["token"], $_SESSION["uid"], $_SESSION["email"], $_SESSION["resid"], $_SESSION["hash"]);
         header("Location: /password/success.php");

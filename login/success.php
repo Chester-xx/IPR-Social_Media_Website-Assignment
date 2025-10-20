@@ -48,6 +48,7 @@
                 "si",
                 $name, $uid
             );
+            CatchDBError($tmp);
         }
         // no image was uploaded so just proceed - there is a default.jpg string for each new user account
         unset($_SESSION["acc_created"]);

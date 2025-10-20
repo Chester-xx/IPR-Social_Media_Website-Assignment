@@ -37,6 +37,7 @@
             "i",
             $res
         );
+        CatchDBError($result);
         // Calc remaining time by subtracting current from expiry
         $expr = strtotime($result->fetch_assoc()["Expires"]) - time();
         if ($expr < 0) $expr = 0;

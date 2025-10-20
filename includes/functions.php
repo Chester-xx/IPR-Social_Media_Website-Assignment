@@ -1,7 +1,5 @@
 <?php
 
-use Dba\Connection;
-
     // --- CONSTANTS ---
     define("PFP", __DIR__ . "/../content/profiles/");
     define("POST", __DIR__ . "/../content/posts/");
@@ -9,34 +7,14 @@ use Dba\Connection;
     define("ACCEPTED_PFP", ["jpg", "jpeg", "png", "webp"]);
     // --- CONSTANTS END ---
 
-    function CheckPageAccess(): void {
-        // what pages the visitors can access
-        $page_access_visitor = [
-            "/login/index.php",
-            "/login/regform.php",
-            "/login/success.php",
-            "/password/email.php",
-            "/password/process.php",
-            "/password/confirm.php",
-            "/password/reset.php",
-            "password/success.php",
-            "logout.php"
-        ];
-        // what pages users can access
-        $page_access_user = [
-            "/dashboard/index.php",
-            "/dashboard/options.php",
-            "/dashboard/profile.php"
-        ];
-        
-
-    }
-
     function Error(string $error, string $message, bool $pure_text = false): void {
         // tests if an error of '$error' exists from GET and outputs the specified message
         // if pure_text is specified to true, the error message will not be formated but printed as a pure string
         // this makes it easier for me to print errors to inputs like textarea
         if (isset($_GET["error"]) && $_GET["error"] == $error) {
+            if ($pure_text) { echo(htmlspecialchars($message, ENT_QUOTES, "UTF-8")); }
+            else { echo("<span class=\"error\">" . htmlspecialchars($message, ENT_QUOTES, "UTF-8") . "</span>"); }
+        } else if ($error == "None") {
             if ($pure_text) { echo(htmlspecialchars($message, ENT_QUOTES, "UTF-8")); }
             else { echo("<span class=\"error\">" . htmlspecialchars($message, ENT_QUOTES, "UTF-8") . "</span>"); }
         }
@@ -120,8 +98,22 @@ use Dba\Connection;
             if ($closeconn) $connection->close();
             return $result;
         } catch (Exception $e) {
-            return ["message" => $e->getMessage(), "errno" => $e->getCode()];
+            return ["success" => false, "error" => ["message" => $e->getMessage(), "code" => $e->getCode()]];
         }
+    }
+
+    function CatchDBError(mixed $Result, bool $APICALL = false): bool {
+        // I choose whether to assign the return value, if its under my use case
+        if ($APICALL) {
+            if (is_array($Result) && array_key_exists("error", $Result)) {
+                return true;
+            }
+        } else if (is_array($Result) && array_key_exists("error", $Result)) {
+            $error = $Result["error"];
+            Error("None", ($error["message"] ?? "Unknown error") . ", Code: " . ($error["code"] ?? "N/A"));
+            return true;
+        }
+        return false;
     }
 
     function CheckQueryResult(mysqli_result | bool $result, mysqli_stmt | bool $statement, mysqli | bool $connection, string $message): void {
@@ -129,7 +121,7 @@ use Dba\Connection;
         if ($result->num_rows < 1) {
             $statement->close();
             $result->free();
-            mysqli_close($connection);
+            $connection->close();
             header("Location: $message");
             exit();
         }
@@ -140,7 +132,7 @@ use Dba\Connection;
         if ($result->num_rows > 0) {
             $statement->close();
             $result->free();
-            mysqli_close($connection);
+            $connection->close();
             header("Location: $message");
             exit();
         }
@@ -150,7 +142,7 @@ use Dba\Connection;
         // checks if insertion OR update to the database has failed
         if ($statement->affected_rows < 1) {
             $statement->close();
-            mysqli_close($connection);
+            $connection->close();
             if ($message != "None") {
                 header("Location: " . $message);
                 exit();

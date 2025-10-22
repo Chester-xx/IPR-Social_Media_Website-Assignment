@@ -44,6 +44,7 @@
         - | LikeID | PK -int - auto_inc - not null
         - | UserID | FK - int - not null
         - | PostID | FK - int - not null
+        - | LikeDate | datetime - current_timestamp - not null
 
     ### tblMessages - Stores private message information
         - | MessageID | PK - int - auto_inc - not null
@@ -51,6 +52,13 @@
         - | RecieverID | FK - int - not null
         - | Message | text - not null
         - | SentAt | datetime - current_timestamp - not null
+    
+    ### tblComments - Stores all the comments for all posts
+        - | CommentID | PK - int - auto_inc - not null
+        - | PostID | FK - int - not null
+        - | UserID | FK - int - not null
+        - | Content | text - not null
+        - | CreateTime | datetime - current_timestamp - not null
 
     ## Other Database Information
     - Images that can be uploaded, are stored as relative file names

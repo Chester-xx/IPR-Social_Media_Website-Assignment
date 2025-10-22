@@ -193,7 +193,6 @@ body {
     display: block;
     margin: 0 0;
     width: calc(100% - 1.6rem);
-    /* height: 2vh; */
     background: #0f0f0f;
     color: #fff;
     border: none;
@@ -233,9 +232,6 @@ body {
     border-radius: 50% !important;
     object-fit: cover;
     vertical-align: middle;
-  }
-  .post:hover {
-    background: #202020;
   }
   .post p {
     margin-top: 0.5rem;
@@ -299,9 +295,9 @@ body {
     margin: 0.5rem;
     padding-bottom: 0.8rem;
   }
-/* --- POSTS PAGE --- */
+/* --- POSTS PAGE END --- */
 
-/* PROFILE PAGE */
+/* --- PROFILE PAGE --- */
   .profile-page-cont {
     max-width: 1000px;
     margin: 0 auto;
@@ -361,4 +357,17 @@ body {
   .profile-btn button:hover {
     background: #2b83db;
   }
-/* PROFILE PAGE */
+/* --- PROFILE PAGE END --- */
+
+/* --- COMMENTS --- */
+  .cmnt-body strong {
+    display: block;
+    margin-bottom: 0.15rem;
+    font-size: 0.9rem;
+  }
+  .cmnt-body small {
+    font-size: 0.75rem;
+    color: #888888;
+    margin-bottom: 1.5rem;
+  }
+/* --- COMMENTS END --- */

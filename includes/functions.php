@@ -1,5 +1,4 @@
 <?php
-
     // --- CONSTANTS ---
     define("PFP", __DIR__ . "/../content/profiles/");
     define("POST", __DIR__ . "/../content/posts/");
@@ -175,5 +174,4 @@
             exit();
         }
     }
-
 ?>

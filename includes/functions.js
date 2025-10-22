@@ -9,7 +9,7 @@ function ToTop() {
 // API helper function
 // When the user is some distance close to the end of the page, load more content
 function Scroll() {
-    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 200) {
+    if (!loading && cont && (document.documentElement.scrollTop + window.innerHeight) >= document.documentElement.scrollHeight - 150) {
         GetNewPosts(0);
     }
 }
@@ -25,6 +25,16 @@ function PreviewUpload(event) {
         preview.innerHTML = "";
         preview.appendChild(img);
     }
+}
+
+function timesince(date) {
+    const s = Math.floor((new Date() - new Date(date)) / 1000);
+    const u = [["year", 31536000], ["month", 2592000], ["day", 86400], ["hour", 3600], ["minute", 60]];
+    for (const [name, sec] of u) {
+        const n = Math.floor(s/sec);
+        if (n > 0) return n + " " + name + (n > 1 ? "s" : "") + " ago";
+    }
+    return "just now";
 }
 
 // Requests data from API to get the next 10 posts from the database
@@ -80,6 +90,7 @@ async function GetNewPosts(APICALL, uid = null) {
                 minute: "2-digit",
                 hour12: false
             });
+            const likestate = post.Liked ? "../content/assets/liked.png" : "../content/assets/unliked.png";
             div.innerHTML = `
                 <div class="post-head">
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -93,13 +104,14 @@ async function GetNewPosts(APICALL, uid = null) {
                 </div>
                 <div class="row" style="justify-content: space-between; align-items: center; margin-top: 0.5rem;">
                     <div style="display: flex; align-items: center; gap: 1rem;">
-                        <img id="like-${post.PostID}" src="../content/assets/liked.png" alt="Like" class="ico" style="width: 1.8rem;">
+                        <img id="like-${post.PostID}" src="${likestate}" alt="Like" class="ico" style="width: 1.8rem;">
                         <img id="comment-${post.PostID}" src="../content/assets/comment.png" alt="Comment" class="ico" style="width: 1.8rem;">
                     </div>
                     <small>${time}</small>
                 </div>
             `;
             box.appendChild(div);
+            const like = document.getElementById(`like-${post.PostID}`);
             div.addEventListener("dblclick", async () => {
                 try {
                     // send to PHP $_POST
@@ -111,11 +123,7 @@ async function GetNewPosts(APICALL, uid = null) {
                     });
                     const data = await response.json();
                     if (data.success) {
-                        if (data.liked) {
-                            like.src = "../content/assets/liked.png";
-                        } else {
-                            like.src = "../content/assets/unliked.png";
-                        }
+                        like.src = data.liked ? "../content/assets/liked.png" : "../content/assets/unliked.png";
                     } else {
                         console.error(data.error.message, ", Code: ", data.error.code);
                     }
@@ -124,7 +132,6 @@ async function GetNewPosts(APICALL, uid = null) {
                 }
             });
             
-            const like = document.getElementById(`like-${post.PostID}`);
             like.addEventListener("click", async () => {
                 try {
                     // send to PHP $_POST
@@ -149,9 +156,91 @@ async function GetNewPosts(APICALL, uid = null) {
                 }
             });
 
-            comment = document.getElementById(`comment-${post.PostID}`);
-            comment.addEventListener("click", async () => {
-                OpenComments(post.PostID);
+            document.getElementById(`comment-${post.PostID}`).addEventListener("click", async () => {
+                try {
+                    let commentsection = document.getElementById(`comments-${post.PostID}`);
+                    if (commentsection) {
+                        commentsection.remove();
+                        return;
+                    }
+                    commentsection = document.createElement("div");
+                    commentsection.id = `comments-${post.PostID}`;
+                    commentsection.classList.add("post-box");
+                    commentsection.style.border = "none";
+                    commentsection.innerHTML = `
+                        <div class="row" style="margin-bottom: 0.5rem">
+                            <textarea style="height: 1.2rem" id="input-${post.PostID}" placeholder="Add a comment"></textarea>
+                            <button style="margin-top: 0rem" id="btn-${post.PostID}">Post</button>
+                        </div>
+                        <div id="list-${post.PostID}" class="posts"></div>
+                    `;
+                    div.appendChild(commentsection);
+
+                    const response = await fetch(`/api/posts/requestcomments.php?PostID=${post.PostID}`);
+                    const data = await response.json();
+                    const list = document.getElementById(`list-${post.PostID}`);
+
+                    if (data.none) {
+                        list.innerHTML = `<small style="display: block; text-align: center; margin-top: 1rem;">No comments yet</small>`;
+                    } else {
+                        data.comments.forEach(comment => {
+                            const commentdiv = document.createElement("div");
+                            let time = timesince(comment.CreateTime);
+                            commentdiv.innerHTML = `
+                                <div class="row" style="align-items: center; justify-content: space-between; width: 100%">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem">
+                                        <img src="../content/profiles/${comment.PFP}" class="post-pfp" alt="Profile Photo">
+                                        <strong>${comment.Username}</strong>
+                                    </div>
+                                    <small>${time}</small>
+                                </div>
+                                <div class="cmnt-body">
+                                    <p>${comment.Content}</p>
+                                </div>
+                            `;
+                            list.appendChild(commentdiv);
+                        });
+                    }
+
+                    const postbtn = document.getElementById(`btn-${post.PostID}`);
+                    const input = document.getElementById(`input-${post.PostID}`);
+
+                    postbtn.addEventListener("click", async () => {
+                        const content = input.value.trim();
+                        if (!content) { return; }
+                        const form = new FormData();
+                        form.append("PostID", post.PostID);
+                        form.append("Content", content);
+                        const response2 = await fetch(`/api/posts/comment.php`, {
+                            method: "POST",
+                            body: form
+                        });
+                        const result = await response2.json();
+                        if (result.success) {
+                            const commentdivnew = document.createElement("div");
+                            let time = timesince(Date());
+                            commentdivnew.innerHTML = `
+                                <div class="row" style="align-items: center; justify-content: space-between; width: 100%">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem">
+                                        <img src="../content/profiles/${upfp}" class="post-pfp" alt="Profile Photo">
+                                        <strong>${username}</strong>
+                                    </div>
+                                    <small>${time}</small>
+                                </div>
+                                <div class="cmnt-body">
+                                    <p>${input.value.trim()}</p>
+                                </div>
+                            `;
+                            list.prepend(commentdivnew);
+                            input.value = "";
+                        } else {
+                            console.log("fail");
+                        }
+                    });
+
+                } catch (e) {
+                    console.error(e);
+                }
             });
 
         });

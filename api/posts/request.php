@@ -12,13 +12,19 @@
     // Get posts from offset for some limit defined
     $result = RunQuery(
         null,
-        "Select u.Username, u.PFP, p.Content, p.Image, p.CreateTime, p.PostID From tblPosts p Join tblUsers u On p.UserID = u.UserID Order By p.PostID Desc Limit ? Offset ?",
+        "Select u.Username, u.PFP, p.Content, p.Image, p.CreateTime, p.PostID, If(l.UserID Is Not Null, 1, 0) As Liked
+        From tblPosts p 
+        Join tblUsers u On p.UserID = u.UserID 
+        Left Join tblLikes l On l.PostID = p.PostID And l.UserID = ?
+        Order By p.PostID Desc 
+        Limit ? 
+        Offset ?",
         "None",
         "",
-        "ii",
-        $loadlimit, $offset
+        "iii",
+        $_SESSION["UserID"], $loadlimit, $offset
     );
-    // check for exceptions
+    // Check for exceptions
     if ((is_array($result) && array_key_exists("error", $result) && CatchDBError($result, true))) {
         // response 500 refers to a server side http response code, access failure
         http_response_code(500);
@@ -33,7 +39,10 @@
     while ($row = $result->fetch_assoc()) {
         $safe = [];
         foreach ($row as $key => $value) {
-            if (is_string($value)) {
+            if ($key == "Liked") {
+                $safe[$key] = (bool)$value;
+            }
+            else if (is_string($value)) {
                 $safe[$key] = htmlspecialchars($value, ENT_QUOTES, "UTF-8");
             } else {
                 $safe[$key] = $value;

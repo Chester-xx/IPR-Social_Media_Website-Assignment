@@ -1,6 +1,7 @@
 <?php
     include_once("../includes/functions.php");
     StartSesh();
+    CheckNotLoggedIn();
 ?>
 
 <!DOCTYPE html>
@@ -9,16 +10,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../style/style.css">
-    <title>Connect | Reset Successful</title>
+    <title>@Connect | Find User</title>
 </head>
 <body>
-    <?php PrintHeader(); ?>
-    <div class="page">
-        <div class="auth">
-            <h1>Success</h1>
-            <p>Password changed Successfully</p>
-            <span>Continue to | <a href="/login/">Log In</a></span>
-        </div>
-    </div>
+    
 </body>
 </html>

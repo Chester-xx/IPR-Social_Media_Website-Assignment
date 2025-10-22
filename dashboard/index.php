@@ -5,7 +5,7 @@
     // Get profile photo name
     $result = RunQuery(
         null,
-        "Select `PFP` From `tblUsers` Where `UserID` = ?",
+        "Select `PFP`, `Username` From `tblUsers` Where `UserID` = ?",
         "Query",
         "/dashboard/error.php?error=dbfail",
         "i",
@@ -15,6 +15,8 @@
     // Create web path for loading into src
     $data = $result->fetch_assoc();
     $path = "../content/profiles/" . $data["PFP"];
+    $upfp = $data["PFP"];
+    $username = $data["Username"];
     // Check if the file exists, otherwise display default
     if (!file_exists(__DIR__ . "/../content/profiles/" . $data["PFP"])) {
         $path = "../content/profiles/default.jpg";
@@ -27,7 +29,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <link rel="stylesheet" href="/style/style.css">
+     <link rel="stylesheet" href="../style/style.css">
     <title>@Connect</title>
 </head>
 <body>
@@ -102,6 +104,8 @@
         let loading = false;
         let cont = true;
         const loadlimit = 10;
+        const upfp = <?php echo("\"$upfp\"");?>;
+        const username = <?php echo("\"$username\""); ?>;
         // --- Event Bindings ---
         // Clicks for each file upload action
         const actions = ["post_upload_image", "post_upload_gif", "post_upload_video"];

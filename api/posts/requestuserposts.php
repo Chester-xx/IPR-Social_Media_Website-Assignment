@@ -16,11 +16,19 @@
     if (!$BadReq) {
         $result = RunQuery(
             null,
-            "Select u.Username, u.PFP, p.Content, p.Image, p.CreateTime From tblPosts p Join tblUsers u On p.UserID = u.UserID Where p.UserID = ? Order By p.PostID Desc Limit ? Offset ?",
+            "Select u.Username, u.PFP, p.PostID, p.Content, p.Image, p.CreateTime, 
+            If(l.UserID Is Not Null, 1, 0) As Liked 
+            From `tblPosts` p 
+            Join `tblUsers` u On p.UserID = u.UserID 
+            Left Join `tblLikes` l On l.PostID = p.PostID And l.UserID = ? 
+            Where p.UserID = ? 
+            Order By p.PostID Desc 
+            Limit ? 
+            Offset ?",
             "None",
             "",
-            "iii",
-            $uid, $loadlimit, $offset
+            "iiii",
+            $_SESSION["UserID"], $uid, $loadlimit, $offset
         );
     }
     // catch exceptions

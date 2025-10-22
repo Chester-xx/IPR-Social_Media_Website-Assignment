@@ -105,7 +105,7 @@
             }
         ?>
         <!-- Posts Summary -->
-        <div class="posts" id="posts"></div>
+        <div class="posts" id="posts" style="border-top: 1px solid #333;"></div>
         <div id="loading" class="loader">Loading</div>
     </div>
 

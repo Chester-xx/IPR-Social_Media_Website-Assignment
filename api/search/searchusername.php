@@ -28,7 +28,7 @@
     $list = [];
     // append each user, xss prevent username as it will be outputted
     while ($row = $result->fetch_assoc()) {
-        $list[] = ["Username" => htmlspecialchars($row["Username"], ENT_QUOTES, "UTF-8"), "PFP" => $row["pfp"]];
+        $list[] = ["Username" => htmlspecialchars($row["Username"], ENT_QUOTES, "UTF-8"), "PFP" => $row["PFP"]];
     }
     // Send user list
     echo(json_encode(["success" => true, "users" => $list]));

@@ -13,6 +13,53 @@
     <title>@Connect | Find User</title>
 </head>
 <body>
-    
+    <?php PrintHeader(); ?>
+    <div class="search-cont">
+        <div class="search">
+            <div class="search-bar">
+                <input type="text" id="search_qry" placeholder="Search for a User">
+            </div>
+            <div id="note" style="text-align: center;">Users will appear here</div>
+            <div class="search-results" id="search-results"></div>
+        </div>
+    </div>
+    <script>
+        const searchbar = document.getElementById("search_qry");
+        const results = document.getElementById("search-results");
+        searchbar.addEventListener("input", async () => {
+            const qry = searchbar.value.trim();
+            if (!qry) return;
+            document.getElementById("note").innerHTML = "";
+            results.innerHTML = `<small>Loading</small>`;
+            try {
+                const response = await fetch(`/api/search/searchusername.php?query=${qry}`);
+                const data = await response.json();
+
+                if (!data.success) {
+                    results.innerHTML = `<p class="error">${data.error.message}, code: ${data.error.code}</p>`;
+                    return;
+                }
+                if (data.users.length === 0) {
+                    results.innerHTML = `<p>No users found</p>`;
+                    return;
+                }
+                results.innerHTML = "";
+                data.users.forEach(user => {
+                    const div = document.createElement("div");
+                    div.classList.add("result");
+                    div.innerHTML = `
+                        <a href="../dashboard/profile.php?Username=${user.Username}">
+                            <img src="../content/profiles/${user.PFP}" alt="User profile photo">
+                            <strong>${user.Username}</strong>
+                        </a>
+                    `;
+                    results.appendChild(div);
+                });
+            } catch (e) {
+                results.innerHTML = `<p class="error">Error fetching user results</p>`;
+                console.error(e);
+            }
+        });
+    </script>
 </body>
 </html>

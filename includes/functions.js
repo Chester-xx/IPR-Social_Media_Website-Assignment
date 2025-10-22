@@ -249,9 +249,9 @@ async function GetNewPosts(APICALL, uid = null) {
         cont = data.continue;
         // either empty text or no elements based on data.continue
         document.getElementById("loading").innerText = cont ? "" : "No posts";
-    } catch (err) {
+    } catch (e) {
         // debug
-        console.error("Fetch Error:", err);
+        console.error("Fetch Error:", e);
         document.getElementById("loading").innerText = "Network error";
     }
     // reset function for next load

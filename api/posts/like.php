@@ -11,7 +11,7 @@
         // No values
         if ($pid === 0) {
             http_response_code(403);
-            echo(json_encode(["success" => false, "error" => "Post ID not specified"]));
+            echo(json_encode(["success" => false, "error" => ["message" => "Post ID not set: ", "code" => 403]]));
             exit();
         }
         // Insert like

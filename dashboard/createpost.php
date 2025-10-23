@@ -1,5 +1,4 @@
 <?php
-    echo $_SERVER["HTTP_REFERER"];
     include_once("../includes/functions.php");
     StartSesh();
     CheckNotLoggedIn();

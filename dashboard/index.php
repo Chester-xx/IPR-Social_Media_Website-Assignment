@@ -99,34 +99,30 @@
     <!-- SCRIPTS -->
     <script src="../includes/functions.js"></script>
     <script>
-        // --- Var Declerations ---
-        let offset = 0;
-        let loading = false;
-        let cont = true;
-        const loadlimit = 10;
+        // --- Var Declarations ---
+        const followingbtn = document.getElementById("following");
+        const recentbtn = document.getElementById("recent");
+        const postbox = document.getElementById("posts");
+        const actions = ["post_upload_image", "post_upload_gif", "post_upload_video"];
         const upfp = <?php echo("\"$upfp\"");?>;
         const username = <?php echo("\"$username\""); ?>;
+
         // --- Event Bindings ---
-        // Clicks for each file upload action
-        const actions = ["post_upload_image", "post_upload_gif", "post_upload_video"];
+            // Upload Actions 
         actions.forEach(id => {
             document.getElementById(id).addEventListener("click", function() {
                 document.getElementById("post_img").click();
             })
         });
-        // Post Loading
+            // Load Posts End of Page
         window.addEventListener("scroll", function() {
             Scroll();
         });
-        // Preview handler
+            // Preview handler
         document.getElementById("post_img").addEventListener("change", PreviewUpload);
-        
+
         // --- Function Calls ---
-        // Get 10 Newest Posts
-        let following = false;
-        const followingbtn = document.getElementById("following");
-        const recentbtn = document.getElementById("recent");
-        const postbox = document.getElementById("posts");
+            // Friend Posts Tab
         followingbtn.addEventListener("click", () => {
             following = true;
             followingbtn.classList.add("active");
@@ -137,6 +133,7 @@
             cont = true;
             GetNewPosts(2);
         });
+            // Recent Posts Tab
         recentbtn.addEventListener("click", () => {
             following = false;
             recentbtn.classList.add("active");

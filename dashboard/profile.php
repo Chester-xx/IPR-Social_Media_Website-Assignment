@@ -39,7 +39,7 @@
         $IS_OWN_PAGE = ($_SESSION["UserID"] === $DBUSER["UserID"]);
         $uid = $DBUSER["UserID"];
     }
-    $conn->close();
+    $followstate = "";
     // set USER DATA (for viewing) & VIEWER DATA (for comments and likes)
     if ($IS_OWN_PAGE) {
         $udata = $result1->fetch_assoc();
@@ -47,7 +47,56 @@
     } else {
         $udata = $DBUSER;
         $vdata = $result1->fetch_assoc();
+        // Check if viewer is friends with user
+        $result = RunQuery(
+            $conn,
+            "Select 1 From `tblFollowers` Where `UserID` = ? And `UserFollowerID` = ? Limit 1",
+            "None",
+            "",
+            "ii",
+            $udata["UserID"], $vdata["UserID"]
+        );
+        CatchDBError($result);
+        // If friend row found
+        if ($result->num_rows == 1) {
+            $followstate = "Unfollow";
+            $btncolor = "#333333";
+        }
+        // If request row found
+        if ($result->num_rows < 1) {
+            // Check if viewer has requested to follow user
+            $result = RunQuery(
+                $conn,
+                "Select 1 From `tblFollowRequests` Where `FromID` = ? And `ToID` = ?",
+                "None",
+                "",
+                "ii",
+                $vdata["UserID"], $udata["UserID"]
+            );
+            CatchDBError($result);
+            // User either requested to follow or doesnt follow at all
+            if ($result->num_rows == 1) {
+                $followstate = "Requested";
+                $btncolor = "#2c2c2cff";
+            } else {
+                $followstate = "Follow";
+                $btncolor = "#498bd6";
+            }
+        }
     }
+    // Get user friend count
+    $result = RunQuery(
+        $conn,
+        "Select Count(*) As `Friends` From `tblFollowers` Where `UserFollowerID` = ?",
+        "None",
+        "",
+        "i",
+        $udata["UserID"]
+    );
+    CatchDBError($result);
+    // Get friend count
+    $friendcount = $result->fetch_assoc()["Friends"];
+    $conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -70,18 +119,29 @@
                 <img src="<?php echo("../content/profiles/" . (file_exists(__DIR__ . "/../content/profiles/" . $udata["PFP"]) ? $udata["PFP"] : "default.jpg")); ?>" alt="Profile Photo">
                 <div class="profile-details">
                     <h2><?php echo($udata["Username"]); ?></h2>
-                    <p>75 Friends</p>
+                    <p><a href="../dashboard/followers.php" class="noline"><?php 
+                            if ($friendcount < 1) {
+                                echo("No Friends");
+                            } else if ($friendcount == 1) {
+                                echo("1 Friend");
+                            } else {
+                                echo($friendcount . " Friends");
+                            }
+                        ?>
+                    </a></p>
                 </div>
             </div>
             <div class="profile-btn">
-                <?php echo($IS_OWN_PAGE ? "<a href='../dashboard/options.php'><button>Edit Profile</button></a>" : "<a href='../users/follow.php?uid=" . $udata["UserID"] . "'><button>Follow</button></a>"); ?>
+                <?php 
+                echo($IS_OWN_PAGE ? 
+                    "<a href='../dashboard/options.php'><button>Edit Profile</button></a>" : 
+                    "<a href='../users/follow.php?uid=" . $udata["UserID"] . "&state=" . $followstate . "'>
+                        <button style='Background: " . $btncolor . "'>" . $followstate . "</button>
+                    </a>"); ?>
                 <a href="../dashboard/"><button>Home</button></a>
             </div>
         </div>
-            
-    
         <!-- Create Post -->
-        <!-- create a post -->
         <?php
             if ($IS_OWN_PAGE) {
                 echo('
@@ -108,20 +168,16 @@
         <div class="posts" id="posts" style="border-top: 1px solid #333;"></div>
         <div id="loading" class="loader">Loading</div>
     </div>
-
     <script src="../includes/functions.js"></script>
     <script>
         // --- Var Declerations ---
-        let uid = <?php echo($udata["UserID"]); ?>;
-        let offset = 0;
-        let loading = false;
-        let cont = true;
-        const loadlimit = 10;
         const upfp = <?php echo("\"" . $vdata["PFP"] . "\"");?>;
         const username = <?php echo("\"" . $vdata["Username"] . "\""); ?>;
+        uid = <?php echo($udata["UserID"]); ?>;
+        APICALL = 1;
 
         // --- Event Bindings ---
-        // Clicks for each file upload action && Preview handler only if IS_OWN_PAGE
+            // Clicks for each file upload action && Preview handler only if IS_OWN_PAGE
         <?php
             if ($IS_OWN_PAGE) {
                 echo('
@@ -135,13 +191,13 @@
                 );
             }
         ?>
-        // Post Loading
+            // Post Loading
         window.addEventListener("scroll", function() {
             Scroll();
         });
+
         // --- Function Calls ---
         GetNewPosts(1, uid);
     </script>
-
 </body>
 </html>

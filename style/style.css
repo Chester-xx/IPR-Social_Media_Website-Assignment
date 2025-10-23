@@ -37,15 +37,12 @@ body {
   }
 /* --- HEADER END --- */
 
-/* --- PAGE CONTENT --- */
+/* --- AUTH PAGE CONTENT --- */
   .page {
     display: flex;
     justify-content: center;
     align-items: center;
   }
-/* --- PAGE CONTENT END --- */
-
-/* --- AUTH PAGE CONTAINER --- */
   .auth {
     background: #000000;
     padding: 3rem;
@@ -53,7 +50,8 @@ body {
     border: #333 solid 1px;
     border-radius: 8px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    width: 350px;
+    width: 100%;
+    max-width: 600px;
     text-align: center;
   }
   .auth h1 {
@@ -72,14 +70,17 @@ body {
     color: #555;
   }
   .auth input {
+    box-sizing: border-box;
     padding: 0.7rem;
-    margin-bottom: 1.3rem;
-    border: 1px solid #333;
+    margin: 1rem 0;
+    border: 1px solid #333333;
     background-color: #0f0f0f;
     color: #ffffff;
     border-radius: 5px;
     font-size: 1rem;
     transition: border 0.3s ease;
+    width: 100%;
+    max-width: 575px;
   }
   .auth input:focus {
     border-color: #9ec3ee;
@@ -87,13 +88,16 @@ body {
   }
   .auth button {
     padding: 1rem;
+    margin: 1rem 0;
     background: #498bd6;
     color: #ffffff;
     border: none;
-    border-radius: 8px;
+    border-radius: 5px;
     font-size: 1.2rem;
     cursor: pointer;
     transition: background 0.3s ease, transform 0.1s ease;
+    width: 100%;
+    max-width: 575px;
   }
   .auth button:hover {
     background: #2b83db;
@@ -109,7 +113,7 @@ body {
       font-size: 0.8rem;
       font-weight: lighter;
   }
-/* --- AUTH PAGE CONTAINER END --- */
+/* --- AUTH PAGE CONTENT --- */
 
 /* --- ACCESS BAR --- */
   .acc-bar {
@@ -365,11 +369,11 @@ body {
     font-size: 1rem;
     transition: background 0.2s ease;
   }
-  .profile-btn button.active {
+  .profile-btn button.active, a.active {
     background: #333333;
     transition: background 0.2s ease;
   }
-  .profile-btn button:hover {
+  .profile-btn button:hover, a.hover {
     background: #2b83db;
   }
 /* --- PROFILE PAGE END --- */
@@ -466,3 +470,89 @@ body {
   font-weight: 600;
 }
 /* --- SEARCH PAGE END --- */
+
+/* --- FOLLOWERS PAGE --- */
+  .followers-page {
+    max-width: 700px;
+    margin: 2rem auto;
+    background: #000;
+    color: #fff;
+    padding: 1.5rem;
+    border: 1px solid #333333;
+    border-radius: 5px;
+  }
+  .followers-page h2 {
+    color: #ffffff;
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #333;
+    padding-bottom: 0.4rem;
+  }
+  .follow-list, .friends-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-bottom: 2rem;
+  }
+  .follow-item, .friend-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #0f0f0f;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    transition: background 0.2s ease, transform 0.1s ease;
+  }
+  .follow-item:hover, .friend-item:hover {
+    background: #1a1a1a;
+    transform: scale(1.01);
+  }
+  .follow-item img, .friend-item img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: 2px solid #498bd6;
+    object-fit: cover;
+  }
+  .follow-details, .friend-details {
+    flex-grow: 1;
+    margin-left: 1rem;
+  }
+  .follow-details strong, .friend-details strong {
+    display: block;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  .follow-details small, .friend-details small {
+    color: #888;
+    font-size: 0.85rem;
+  }
+  .follow-actions, .friend-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .follow-actions button, .friend-actions button {
+    border: none;
+    border-radius: 5px;
+    padding: 0.5rem 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    font-size: 0.9rem;
+  }
+  .accept {
+    background: #498bd6;
+    color: #fff;
+  }
+  .accept:hover {
+    background: #2b83db;
+  }
+
+  .decline {
+    background: #d84f40;
+    color: #fff;
+  }
+  .decline:hover {
+    background: #c43d2e;
+  }
+/* --- FOLLOWERS PAGE END --- */

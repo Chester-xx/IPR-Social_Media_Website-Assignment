@@ -1,21 +1,50 @@
-// When the user wants to create a post, they click on the + icon
-// This takes the user to the top of the page where the post-box is
-// Focusing on the textarea for typing 
+// --- GLOBALS ---
+
+let offset = 0;
+let loadlimit = 10;
+let loading = false;
+let cont = true;
+let uid = null;
+let feed = "recents";
+let timer = null;
+let following = false;
+let APICALL = 0;
+
+// --- FUNCTIONS ---
+
 function ToTop() {
+    // When the user wants to create a post, they click on the + icon
+    // This takes the user to the top of the page where the post-box is
+    // Focusing on the textarea for typing 
     window.scrollTo({top : 0, behavior : "smooth"});
     setTimeout(() => { document.getElementById("post_text").focus(); }, 350);
 }
 
-// API helper function
-// When the user is some distance close to the end of the page, load more content
 function Scroll() {
-    if (!loading && cont && (document.documentElement.scrollTop + window.innerHeight) >= document.documentElement.scrollHeight - 150) {
-        GetNewPosts(0);
+    // API helper function
+    // When the user is some distance close to the end of the page, load more content
+    if (loading || !cont) return;
+    if (timer) clearTimeout(timer);
+    if ((document.documentElement.scrollTop + window.innerHeight) >= ( document.documentElement.scrollHeight - 150)) {
+        GetNewPosts(APICALL, uid, following);
+        timer = setTimeout(() => {
+            switch (feed) {
+                case "recents":
+                    GetNewPosts(0);
+                    break;
+                case "following":
+                    GetNewPosts(2);
+                    break;
+                case "user":
+                    if (currentUID) GetNewPosts(1, currentUID);
+                    break;
+            }
+        }, 200);
     }
 }
 
-// Appends the uploaded file to the post window for user viewing
 function PreviewUpload(event) {
+    // Appends the uploaded file to the post window for user viewing
     const file = event.target.files[0];
     if (file) {
         const img = document.createElement("img");
@@ -28,6 +57,7 @@ function PreviewUpload(event) {
 }
 
 function timesince(date) {
+    // Date formatter, just gives a nice preview like 5mins ago etc
     const s = Math.floor((new Date() - new Date(date)) / 1000);
     const u = [["year", 31536000], ["month", 2592000], ["day", 86400], ["hour", 3600], ["minute", 60]];
     for (const [name, sec] of u) {
@@ -37,33 +67,36 @@ function timesince(date) {
     return "just now";
 }
 
-// Requests data from API to get the next 10 posts from the database
-async function GetNewPosts(APICALL, uid = null) {
-    // hide general calls from user
-    switch (APICALL) {
-        case 0:
-            APICALL = `/api/posts/request.php?offset=${offset}`;
-            break;
-        case 1:
-            APICALL = `/api/posts/requestuserposts.php?uid=${uid}&offset=${offset}`;
-            break;
-        case 2:
-            APICALL = `/api/posts/requestfollowerposts.php?offset=${offset}`;
-    }
+async function GetNewPosts(APICALL, uid = null, following = false) {
+    // Requests data from API to get the next 10 posts from the database
     // dont run if its currently loading data, or if there are no more posts to display
     if (loading || !cont) return;
     loading = true;
-    // set placeholder
     document.getElementById("loading").innerText = "Loading";
     // catch errors
     try {
-        // async get json from api
-        if (following) {
-            APICALL = `/api/posts/requestfollowerposts.php?offset=${offset}`;
-        } else if (!following) {
-            APICALL = `/api/posts/request.php?offset=${offset}`;
+        let endp;
+        // Correct endpoint call to api dependant on each specific request
+        switch (APICALL) {
+            case 0:
+                endp = following ? `/api/posts/requestfollowerposts.php?offset=${offset}` : `/api/posts/request.php?offset=${offset}`;
+                feed = "recents";
+                break;
+            case 1:
+                if (!uid) throw "UID required for user posts";
+                endp = `/api/posts/requestuserposts.php?uid=${uid}&offset=${offset}`;
+                feed = "user";
+                currentUID = uid;
+                break;
+            case 2:
+                endp = `/api/posts/requestfollowerposts.php?offset=${offset}`;
+                feed = "following";
+                break;
+            default:
+                endp = `/api/posts/request.php?offset=${offset}`;
+                feed = "recents";
         }
-        const response = await fetch(APICALL);
+        const response = await fetch(endp);
         const data = await response.json();
         // check if succession of data transmission
         if (!data.success) {
@@ -88,8 +121,7 @@ async function GetNewPosts(APICALL, uid = null) {
                     media = `<img src="../content/posts/${post.Image}" alt="Post Image">`;
                 }
             }
-            let time = new Date(post.CreateTime);
-            time = time.toLocaleString("en-GB", {
+            let time = new Date(post.CreateTime).toLocaleDateString("en-GB", {
                 day: "2-digit",
                 month: "short",
                 year: "numeric",
@@ -138,7 +170,6 @@ async function GetNewPosts(APICALL, uid = null) {
                     console.error(e);
                 }
             });
-            
             like.addEventListener("click", async () => {
                 try {
                     // send to PHP $_POST
@@ -162,7 +193,6 @@ async function GetNewPosts(APICALL, uid = null) {
                     console.error(e);
                 }
             });
-
             document.getElementById(`comment-${post.PostID}`).addEventListener("click", async () => {
                 try {
                     let commentsection = document.getElementById(`comments-${post.PostID}`);
@@ -182,11 +212,9 @@ async function GetNewPosts(APICALL, uid = null) {
                         <div id="list-${post.PostID}" class="posts"></div>
                     `;
                     div.appendChild(commentsection);
-
                     const response = await fetch(`/api/posts/requestcomments.php?PostID=${post.PostID}`);
                     const data = await response.json();
                     const list = document.getElementById(`list-${post.PostID}`);
-
                     if (data.none) {
                         list.innerHTML = `<small style="display: block; text-align: center; margin-top: 1rem;">No comments yet</small>`;
                     } else {
@@ -208,10 +236,8 @@ async function GetNewPosts(APICALL, uid = null) {
                             list.appendChild(commentdiv);
                         });
                     }
-
                     const postbtn = document.getElementById(`btn-${post.PostID}`);
                     const input = document.getElementById(`input-${post.PostID}`);
-
                     postbtn.addEventListener("click", async () => {
                         const content = input.value.trim();
                         if (!content) { return; }
@@ -244,12 +270,10 @@ async function GetNewPosts(APICALL, uid = null) {
                             console.log("fail");
                         }
                     });
-
                 } catch (e) {
                     console.error(e);
                 }
             });
-
         });
         // update the offset for next load
         offset += data.posts.length;
@@ -263,4 +287,119 @@ async function GetNewPosts(APICALL, uid = null) {
     }
     // reset function for next load
     loading = false;
+}
+
+async function GetFollowRequests() {
+    const list = document.getElementById("follow-requests");
+    try {
+        const response = await fetch(`/api/search/followrequests.php`);
+        const data = await response.json();
+        if (!data.success) {
+            console.error("API Error: ", data.error.message, data.error.code);
+            return;
+        }
+        if (data.users.length < 1) {
+            const div = document.createElement("div");
+            div.innerHTML = `<p style="text-align: center">No Follow Requests</p>`;
+            list.appendChild(div);
+            return;
+        }
+        data.users.forEach(user => {
+            const div = document.createElement("div");
+            div.classList.add("follow-item");
+            div.innerHTML = `
+                <img src="../content/profiles/${user.PFP}" alt="Profile Photo">
+                <div class="follow-details">
+                    <strong>${user.Username}</strong>
+                </div>
+                <div class="follow-actions">
+                    <button id="follow-accept-${user.RequestID}" class="accept">Accept</button>
+                    <button id="follow-decline-${user.RequestID}" class="decline">Decline</button>
+                </div>
+            `;
+            list.appendChild(div);
+            const accept = document.getElementById(`follow-accept-${user.RequestID}`);
+            const decline = document.getElementById(`follow-decline-${user.RequestID}`);
+            accept.addEventListener("click", async () => {
+                try {
+                    const response = await fetch(`/api/users/acceptfollow.php?rid=${user.RequestID}`);
+                    const data = response.json();
+                    if (!data.success) {
+                        console.log(data.error.message, data.error.code);
+                        return;
+                    } else {
+                        div.remove();
+                        GetFriendList();
+                    }
+                } catch (e) {
+                    console.log(e);
+                }
+            });
+            decline.addEventListener("click", async () => {
+                try {
+                    const response = await fetch(`/api/users/declinefollow.php?rid=${user.RequestID}`);
+                    const data = response.json();
+                    if (!data.success) {
+                        console.log(data.error.message, data.error.code);
+                        return;
+                    } else {
+                        div.remove();
+                    }
+                } catch (e) {
+                    console.log(e);
+                }
+            });
+        });
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+async function GetFriendList() {
+    const list = document.getElementById("friends-list");
+    try {
+        const response = await fetch(`/api/search/requestfriends.php`);
+        const data = await response.json();
+        if (!data.success) {
+            console.error("API Error: ", data.error.message, data.error.code);
+            return;
+        }
+        if (data.users.length < 1) {
+            const div = document.createElement("div");
+            div.innerHTML = `<p style="text-align: center">No Friends</p>`;
+            list.appendChild(div);
+            return;
+        }
+        data.users.forEach(user => {
+            const div = document.createElement("div");
+            div.classList.add("friend-item");
+            div.innerHTML = `
+                <img src="../content/profiles/${user.PFP}" alt="Profile Photo">
+                <div class="friend-details">
+                    <strong>${user.Username}</strong>
+                </div>
+                <div class="follow-actions">
+                    <button id="friend-remove-${user.UserID}" class="decline">Remove</button>
+                </div>
+            `;
+            list.appendChild(div);
+            const remove = document.getElementById(`friend-remove-${user.UserID}`);
+            remove.addEventListener("click", async () => {
+                try {
+                    const response = await fetch(`/api/users/removefriend.php?rid=${user.UserID}`);
+                    const data = response.json();
+                    if (!data.success) {
+                        console.log(data.error.message, data.error.code);
+                        return;
+                    } else {
+                        div.remove();
+                    }
+                } catch (e) {
+                    console.log(e);
+                }
+            });
+        });
+    } catch (e) {
+        console.error(e);
+    }
 }

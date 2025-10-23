@@ -47,6 +47,8 @@ async function GetNewPosts(APICALL, uid = null) {
         case 1:
             APICALL = `/api/posts/requestuserposts.php?uid=${uid}&offset=${offset}`;
             break;
+        case 2:
+            APICALL = `/api/posts/requestfollowerposts.php?offset=${offset}`;
     }
     // dont run if its currently loading data, or if there are no more posts to display
     if (loading || !cont) return;
@@ -56,6 +58,11 @@ async function GetNewPosts(APICALL, uid = null) {
     // catch errors
     try {
         // async get json from api
+        if (following) {
+            APICALL = `/api/posts/requestfollowerposts.php?offset=${offset}`;
+        } else if (!following) {
+            APICALL = `/api/posts/request.php?offset=${offset}`;
+        }
         const response = await fetch(APICALL);
         const data = await response.json();
         // check if succession of data transmission
@@ -94,8 +101,8 @@ async function GetNewPosts(APICALL, uid = null) {
             div.innerHTML = `
                 <div class="post-head">
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <img src="../content/profiles/${post.PFP}" class="post-pfp" alt="Profile Photo">
-                        <strong>${post.Username}</strong>
+                        <a class="noline" href="/dashboard/profile.php?Username=${post.Username}"><img src="../content/profiles/${post.PFP}" class="post-pfp" alt="Profile Photo"></a>
+                        <a class="noline" href="/dashboard/profile.php?Username=${post.Username}"><strong>${post.Username}</strong></a>
                     </div>
                 </div>
                 <div class="post-body">
@@ -189,8 +196,8 @@ async function GetNewPosts(APICALL, uid = null) {
                             commentdiv.innerHTML = `
                                 <div class="row" style="align-items: center; justify-content: space-between; width: 100%">
                                     <div style="display: flex; align-items: center; gap: 0.5rem">
-                                        <img src="../content/profiles/${comment.PFP}" class="post-pfp" alt="Profile Photo">
-                                        <strong>${comment.Username}</strong>
+                                        <a class="noline" href="/dashboard/profile.php?Username=${comment.Username}"><img src="../content/profiles/${comment.PFP}" class="post-pfp" alt="Profile Photo"></a>
+                                        <a class="noline" href="/dashboard/profile.php?Username=${comment.Username}"><strong>${comment.Username}</strong></a>
                                     </div>
                                     <small>${time}</small>
                                 </div>

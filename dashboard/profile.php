@@ -74,7 +74,7 @@
                 </div>
             </div>
             <div class="profile-btn">
-                <?php if ($IS_OWN_PAGE) { echo("<a href='../dashboard/options.php'><button>Edit Profile</button></a>"); } ?>
+                <?php echo($IS_OWN_PAGE ? "<a href='../dashboard/options.php'><button>Edit Profile</button></a>" : "<a href='../users/follow.php?uid=" . $udata["UserID"] . "'><button>Follow</button></a>"); ?>
                 <a href="../dashboard/"><button>Home</button></a>
             </div>
         </div>

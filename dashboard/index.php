@@ -72,8 +72,8 @@
         <div class="feed">            
             <!-- Header -->
             <div class="feed-head">
-                <button class="active">Recents</button>
-                <button>Following</button>
+                <button id="recent" class="active">Recents</button>
+                <button id="following">Following</button>
             </div>
             <!-- Create a post -->
             <form action="createpost.php" method="post" enctype="multipart/form-data">
@@ -123,6 +123,30 @@
         
         // --- Function Calls ---
         // Get 10 Newest Posts
+        let following = false;
+        const followingbtn = document.getElementById("following");
+        const recentbtn = document.getElementById("recent");
+        const postbox = document.getElementById("posts");
+        followingbtn.addEventListener("click", () => {
+            following = true;
+            followingbtn.classList.add("active");
+            recentbtn.classList.remove("active");
+            postbox.innerHTML = "";
+            offset = 0;
+            loading = false;
+            cont = true;
+            GetNewPosts(2);
+        });
+        recentbtn.addEventListener("click", () => {
+            following = false;
+            recentbtn.classList.add("active");
+            followingbtn.classList.remove("active");
+            postbox.innerHTML = "";
+            offset = 0;
+            loading = false;
+            cont = true;
+            GetNewPosts(0);
+        });
         GetNewPosts(0);
     </script>
 </body>

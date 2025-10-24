@@ -25,7 +25,10 @@
                 ?>
                 <input type="text" name="reg_name" id="reg_name" placeholder="&#129534; Full Name" required>
                 <input type="text" name="reg_username" id="reg_username" placeholder="&#9906; Username" required>
-                <?php Error("usernameexists", "An account is already using that username"); ?>
+                <?php 
+                    Error("usernameexists", "An account is already using that username");
+                    Error("usernameshort", "Username must include 3 or more characters");
+                ?>
                 <input type="password" name="reg_password" id="reg_password" placeholder="&#128274; Password" required>
                 <?php
                     Error("passwordshort", "Password must contain atleast 8 characters");

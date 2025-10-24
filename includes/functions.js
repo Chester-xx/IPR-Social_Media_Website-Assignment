@@ -308,9 +308,9 @@ async function GetFollowRequests() {
             const div = document.createElement("div");
             div.classList.add("follow-item");
             div.innerHTML = `
-                <img src="../content/profiles/${user.PFP}" alt="Profile Photo">
+                <a href="../dashboard/profile.php?Username=${user.Username}"><img src="../content/profiles/${user.PFP}" alt="Profile Photo"></a>
                 <div class="follow-details">
-                    <strong>${user.Username}</strong>
+                    <a class="noline" href="../dashboard/profile.php?Username=${user.Username}"><strong>${user.Username}</strong></a>
                 </div>
                 <div class="follow-actions">
                     <button id="follow-accept-${user.RequestID}" class="accept">Accept</button>
@@ -323,7 +323,7 @@ async function GetFollowRequests() {
             accept.addEventListener("click", async () => {
                 try {
                     const response = await fetch(`/api/users/acceptfollow.php?rid=${user.RequestID}`);
-                    const data = response.json();
+                    const data = await response.json();
                     if (!data.success) {
                         console.log(data.error.message, data.error.code);
                         return;
@@ -338,7 +338,7 @@ async function GetFollowRequests() {
             decline.addEventListener("click", async () => {
                 try {
                     const response = await fetch(`/api/users/declinefollow.php?rid=${user.RequestID}`);
-                    const data = response.json();
+                    const data = await response.json();
                     if (!data.success) {
                         console.log(data.error.message, data.error.code);
                         return;
@@ -357,6 +357,7 @@ async function GetFollowRequests() {
 
 async function GetFriendList() {
     const list = document.getElementById("friends-list");
+    list.innerHTML = "";
     try {
         const response = await fetch(`/api/search/requestfriends.php`);
         const data = await response.json();
@@ -374,20 +375,22 @@ async function GetFriendList() {
             const div = document.createElement("div");
             div.classList.add("friend-item");
             div.innerHTML = `
-                <img src="../content/profiles/${user.PFP}" alt="Profile Photo">
-                <div class="friend-details">
-                    <strong>${user.Username}</strong>
-                </div>
-                <div class="follow-actions">
-                    <button id="friend-remove-${user.UserID}" class="decline">Remove</button>
-                </div>
+                <a href="../dashboard/profile.php?Username=${user.Username}" class="noline">
+                    <a href="../dashboard/profile.php?Username=${user.Username}"><img src="../content/profiles/${user.PFP}" alt="Profile Photo"></a>
+                    <div class="friend-details">
+                        <a class="noline" href="../dashboard/profile.php?Username=${user.Username}"><strong>${user.Username}</strong></a>
+                    </div>
+                    <div class="follow-actions">
+                        <button id="friend-remove-${user.UserID}" class="decline">Remove</button>
+                    </div>
+                </a>
             `;
             list.appendChild(div);
             const remove = document.getElementById(`friend-remove-${user.UserID}`);
             remove.addEventListener("click", async () => {
                 try {
-                    const response = await fetch(`/api/users/removefriend.php?rid=${user.UserID}`);
-                    const data = response.json();
+                    const response = await fetch(`/api/users/removefriend.php?uid=${user.UserID}`);
+                    const data = await response.json();
                     if (!data.success) {
                         console.log(data.error.message, data.error.code);
                         return;

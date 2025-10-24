@@ -130,7 +130,7 @@ body {
   }
   .ico {
     width: 4vh;
-    height: 50%;
+    height: 4vh;
     color: #ffffff;
   }
   .ico-btn {
@@ -164,7 +164,7 @@ body {
     display: flex;
     justify-content: space-around;
     position: sticky;
-    top: 52px;
+    top: 6vh;
     background: #000000;
     margin-top: 0;
     border-bottom: 1px solid #333;
@@ -503,6 +503,8 @@ body {
     border-radius: 8px;
     padding: 0.8rem 1rem;
     transition: background 0.2s ease, transform 0.1s ease;
+    text-decoration: none !important;
+    color: #ffffff !important;
   }
   .follow-item:hover, .friend-item:hover {
     background: #1a1a1a;
@@ -556,3 +558,96 @@ body {
     background: #c43d2e;
   }
 /* --- FOLLOWERS PAGE END --- */
+
+/* --- ACCOUNT OPTIONS PAGE --- */
+.options-page {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  background: #000000;
+  padding-top: 0.2rem;
+}
+
+.options-container {
+  background: #0f0f0f;
+  border: 1px solid #333;
+  border-radius: 10px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 600px;
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.options-container h1 {
+  text-align: center;
+  font-size: 1.8rem;
+  margin-bottom: 2rem;
+  color: #ffffff;
+}
+
+.option-form {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 2rem;
+}
+
+.option-form label {
+  font-size: 0.9rem;
+  color: #aaa;
+  margin-bottom: 0.5rem;
+  text-align: left;
+}
+
+.option-form input {
+  background-color: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 5px;
+  padding: 0.7rem;
+  color: #fff;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.option-form input[type="text"]:focus,
+.option-form input[type="file"]:focus {
+  border-color: #498bd6;
+  outline: none;
+}
+
+.option-form button {
+  background: #498bd6;
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 5px;
+  padding: 0.9rem;
+  margin-top: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.1s ease;
+}
+
+.option-form button:hover {
+  background: #2b83db;
+}
+
+.option-form button:active {
+  transform: scale(0.98);
+}
+
+.divider {
+  border: 0;
+  border-top: 1px solid #333;
+  margin: 2rem 0;
+}
+
+.option-form.danger button {
+  background: #d84f40;
+}
+
+.option-form.danger button:hover {
+  background: #c43d2e;
+}
+/* --- ACCOUNT OPTIONS PAGE END --- */

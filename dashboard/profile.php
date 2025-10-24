@@ -119,16 +119,30 @@
                 <img src="<?php echo("../content/profiles/" . (file_exists(__DIR__ . "/../content/profiles/" . $udata["PFP"]) ? $udata["PFP"] : "default.jpg")); ?>" alt="Profile Photo">
                 <div class="profile-details">
                     <h2><?php echo($udata["Username"]); ?></h2>
-                    <p><a href="../dashboard/followers.php" class="noline"><?php 
+                    <?php
+                        if ($IS_OWN_PAGE) {
+                            echo("<p><a href='../dashboard/followers.php' class='noline'>");
                             if ($friendcount < 1) {
-                                echo("No Friends");
+                                echo('No Friends');
                             } else if ($friendcount == 1) {
-                                echo("1 Friend");
+                                echo('1 Friend');
                             } else {
-                                echo($friendcount . " Friends");
+                                echo($friendcount . ' Friends');
                             }
-                        ?>
-                    </a></p>
+                            echo("</a></p>");
+                        } else {
+                            echo("<p>");
+                            if ($friendcount < 1) {
+                                echo('No Friends');
+                            } else if ($friendcount == 1) {
+                                echo('1 Friend');
+                            } else {
+                                echo($friendcount . ' Friends');
+                            }
+                            echo("</p>");
+                        }
+                    ?>
+
                 </div>
             </div>
             <div class="profile-btn">

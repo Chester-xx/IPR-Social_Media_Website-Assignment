@@ -25,6 +25,10 @@
             header("Location: /login/regform.php?error=invalidemail");
             exit();
         }
+        if (strlen($username) < 3) {
+            header("Location: /login/regform.php?error=usernameshort");
+            exit();
+        }
         // are the passwords atleast 8 characters in length
         if (strlen($password) < 8 || strlen($check) < 8) {
             header("Location: /login/regform.php?error=passwordshort");

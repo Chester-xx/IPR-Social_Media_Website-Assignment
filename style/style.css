@@ -244,6 +244,7 @@ body {
   }
   .post-pfp {
     width: 1.5rem !important;
+    height: 1.5rem !important;
     border-radius: 50% !important;
     object-fit: cover;
     vertical-align: middle;
@@ -416,7 +417,7 @@ body {
   padding: 0.8rem 1rem;
   margin: auto 1.5rem;
   font-size: 1rem;
-  border: 1px solid #333;
+  border: 1px solid #333333;
   border-radius: 5px;
   background-color: #1b1b1b;
   color: #ffffff;
@@ -463,7 +464,7 @@ body {
   height: 45px;
   border-radius: 50%;
   object-fit: cover;
-  border: 1px solid #444;
+  border: 1px solid #444444;
 }
 .result strong {
   font-size: 1rem;
@@ -475,8 +476,8 @@ body {
   .followers-page {
     max-width: 700px;
     margin: 2rem auto;
-    background: #000;
-    color: #fff;
+    background: #000000;
+    color: #ffffff;
     padding: 1.5rem;
     border: 1px solid #333333;
     border-radius: 5px;
@@ -485,7 +486,7 @@ body {
     color: #ffffff;
     font-size: 1.4rem;
     margin-bottom: 1rem;
-    border-bottom: 1px solid #333;
+    border-bottom: 1px solid #333333;
     padding-bottom: 0.4rem;
   }
   .follow-list, .friends-list {
@@ -499,7 +500,7 @@ body {
     align-items: center;
     justify-content: space-between;
     background: #0f0f0f;
-    border: 1px solid #333;
+    border: 1px solid #333333;
     border-radius: 8px;
     padding: 0.8rem 1rem;
     transition: background 0.2s ease, transform 0.1s ease;
@@ -527,7 +528,7 @@ body {
     font-weight: 600;
   }
   .follow-details small, .friend-details small {
-    color: #888;
+    color: #888888;
     font-size: 0.85rem;
   }
   .follow-actions, .friend-actions {
@@ -544,7 +545,7 @@ body {
   }
   .accept {
     background: #498bd6;
-    color: #fff;
+    color: #ffffff;
   }
   .accept:hover {
     background: #2b83db;
@@ -552,7 +553,7 @@ body {
 
   .decline {
     background: #d84f40;
-    color: #fff;
+    color: #ffffff;
   }
   .decline:hover {
     background: #c43d2e;
@@ -571,12 +572,12 @@ body {
 
 .options-container {
   background: #0f0f0f;
-  border: 1px solid #333;
+  border: 1px solid #333333;
   border-radius: 10px;
   padding: 2rem;
   width: 100%;
   max-width: 600px;
-  color: #fff;
+  color: #ffffff;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
 }
 
@@ -595,17 +596,17 @@ body {
 
 .option-form label {
   font-size: 0.9rem;
-  color: #aaa;
+  color: #aaaaaa;
   margin-bottom: 0.5rem;
   text-align: left;
 }
 
 .option-form input {
   background-color: #1a1a1a;
-  border: 1px solid #333;
+  border: 1px solid #333333;
   border-radius: 5px;
   padding: 0.7rem;
-  color: #fff;
+  color: #ffffff;
   font-size: 1rem;
   transition: border-color 0.3s ease;
 }
@@ -619,7 +620,7 @@ body {
 .option-form button {
   background: #498bd6;
   border: none;
-  color: #fff;
+  color: #ffffff;
   font-size: 1rem;
   font-weight: 500;
   border-radius: 5px;
@@ -651,3 +652,321 @@ body {
   background: #c43d2e;
 }
 /* --- ACCOUNT OPTIONS PAGE END --- */
+
+/* --- MESSAGES PAGE --- */
+.messages-page {
+  max-width: 1000px;
+  margin: 2rem auto;
+  background: #000000;
+  color: #ffffff;
+  padding: 1.5rem;
+  border: 1px solid #333333;
+  border-radius: 8px;
+}
+.friends-link {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+.friends-link .btn {
+  background: #498bd6;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  padding: 0.7rem 1.2rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.1s ease;
+  text-decoration: none;
+}
+.friends-link .btn:hover {
+  background: #2b83db;
+}
+.friends-link .btn:active {
+  transform: scale(0.97);
+}
+.messaging-area {
+  display: flex;
+  border: 1px solid #333333;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 70vh;
+  background: #0f0f0f;
+}
+.conversations-list {
+  width: 30%;
+  border-right: 1px solid #333333;
+  padding: 1rem;
+  background: #0f0f0f;
+  overflow-y: auto;
+}
+.conversation-item {
+  display: flex;
+  align-items: center;
+  padding: 0.7rem;
+  margin-bottom: 0.6rem;
+  border-radius: 6px;
+  background: #1a1a1a;
+  border: 1px solid #333333;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+.conversation-item:hover {
+  background: #2a2a2a;
+  transform: scale(1.01);
+}
+.conversation-item img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid #498bd6;
+  object-fit: cover;
+  margin-right: 0.8rem;
+}
+.conversation-item strong {
+  font-size: 0.95rem;
+}
+.conversation-item small {
+  color: #888888;
+  font-size: 0.8rem;
+}
+.chat-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #000000;
+  padding: 1rem;
+}
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+.chat-message {
+  margin-bottom: 0.8rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  max-width: 70%;
+  line-height: 1.3rem;
+}
+.chat-message.sent {
+  background: #498bd6;
+  color: #ffffff;
+  margin-left: auto;
+}
+.chat-message.received {
+  background: #1a1a1a;
+  color: #ffffff;
+  border: 1px solid #333333;
+  margin-right: auto;
+}
+.chat-input-area {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.chat-input-area input {
+  flex: 1;
+  background-color: #1a1a1a;
+  border: 1px solid #333333;
+  border-radius: 5px;
+  padding: 0.7rem;
+  color: #ffffff;
+  font-size: 1rem;
+  transition: border 0.2s ease;
+}
+.chat-input-area input:focus {
+  border-color: #498bd6;
+  outline: none;
+}
+.chat-input-area button {
+  background: #498bd6;
+  border: none;
+  color: #ffffff;
+  border-radius: 5px;
+  padding: 0.7rem 1.2rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+.chat-input-area button:hover {
+  background: #2b83db;
+}
+.friend-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #0f0f0f;
+  border: 1px solid #333333;
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  transition: background 0.2s ease, transform 0.1s ease;
+  text-decoration: none !important;
+  color: #ffffff !important;
+}
+/* --- MESSAGES PAGE END --- */
+
+/* --- MESSAGES OVERIDE --- */
+.messages-page {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    padding: 10px;
+    border: none;
+  }
+  .messaging-area {
+    display: flex;
+    max-width: 600px;
+    width: 100%;
+    border: 1px solid #333333;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .conversations-list {
+    width: 40%;
+    border-right: 1px solid #333333;
+    background-color: #000000;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+  }
+  .conversation-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    background-color: #000000;
+    border-bottom: 1px solid #333333;
+    margin-bottom: 0.5rem;
+  }
+  .conversation-header input {
+    width: 100%;
+    padding: 7px;
+    font-size: 14px;
+    border-radius: 5px;
+    background: #0f0f0f;
+    border: 2px solid #3498db;
+    outline: none;
+  }
+  .conversation-header input:hover, .conversation-header:active {
+    border-color: #2b83db;
+  }
+  .conversation-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    cursor: pointer;
+    background: #000000;
+    transition: background 0.2s;
+  }
+  .conversation-item:hover {
+    background-color: #0f0f0f;
+  }
+  .conversation-item img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+  .chat-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .chat-messages {
+    padding: 10px;
+    overflow-y: auto;
+    height: 400px;
+  }
+  .chat-message {
+    margin: 0.5rem 0.8rem;
+    padding: 10px;
+    border-radius: 8px;
+    max-width: 75%;
+  }
+  .chat-message.sent {
+    background-color: #3498db;
+    border: none;
+    align-self: flex-end;
+  }
+  .chat-message.received {
+    background-color: #0f0f0f;
+    border: none;
+    align-self: flex-start;
+  }
+  .chat-input-area {
+    display: flex;
+  }
+  .chat-input-area input {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    outline: none;
+    width: 80%;
+  }
+  .chat-input-area button {
+    padding: 10px 15px;
+    border: none;
+    background-color: #3498db;
+    margin-right: 0;
+    color: white;
+    cursor: pointer;
+  }
+  .friend-link {
+    text-align: center;
+    justify-content: center;
+    margin: 10px auto;
+    padding: 10px;
+    border: 1px solid #333333;
+    border-radius: 8px;
+    max-width: 580px;
+    height: 2rem;
+    background: #000000;
+    transition: background 0.3s;
+  }
+  .friend-link:hover {
+    background-color: #0f0f0f;
+  }
+  .toggle-list {
+    display: none;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 10px;
+    cursor: pointer;
+    border-radius: 8px;
+    margin: 8px;
+    transition: background 0.3s;
+  }
+  .toggle-list:hover {
+    background: #2b83db;
+  }
+  @media screen and (max-width: 750px) {
+    .messaging-area {
+      flex-direction: column;
+    }
+    .conversations-list {
+      width: 95%;
+      height: auto;
+      display: none;
+    }
+    .conversations-list.active {
+      display: flex;
+    }
+    .toggle-list {
+      display: block;
+    }
+    .chat-box {
+      width: 100%;
+    }
+      .chat-input-area button {
+      padding: 10px 15px;
+      border: none;
+      background-color: #3498db;
+      margin-right: 1.9rem;
+      color: white;
+      cursor: pointer;
+    }
+  }
+/* --- MESSAGES OVERIDE END --- */

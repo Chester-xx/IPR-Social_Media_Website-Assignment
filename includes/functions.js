@@ -9,6 +9,7 @@ let feed = "recents";
 let timer = null;
 let following = false;
 let APICALL = 0;
+let currentUserID = null;
 
 // --- FUNCTIONS ---
 
@@ -404,5 +405,120 @@ async function GetFriendList() {
         });
     } catch (e) {
         console.error(e);
+    }
+}
+
+async function GetConversations() {
+    const conversations = document.getElementById("conversationsList");
+    const chat = document.getElementById("chatMessages");
+    const toggleList = document.getElementById("toggleList");
+    try {
+        conversations.innerHTML = "";
+        const search = document.createElement("div");
+        search.classList.add("conversation-header");
+        search.innerHTML = `<input type="text" id="searchBar" placeholder="Search Users">`;
+        conversations.appendChild(search);
+        const result = document.createElement("div");
+        result.classList.add("conversation-item");
+        result.style.display = "none";
+        conversations.appendChild(result);
+        const searchinp = document.getElementById("searchBar");
+        searchinp.addEventListener("input", async () => {
+            const query = searchinp.value.trim();
+            result.innerHTML = "";
+            result.style.display = "none";
+            if (!query) return;
+            try {
+                const response = await fetch(`/api/messages/searchusers.php?query=${query}`);
+                const data = await response.json();
+                if (!data.success || !data.user) return;
+                currentUserID = data.user.UserID;
+                result.style.display = "flex";
+                result.innerHTML = `
+                    <img src="../content/profiles/${data.user.PFP}" alt="Profile Photo">
+                    <strong>${data.user.Username}</strong>
+                `;
+                result.onclick = () => {
+                    if (currentUserID) OpenConversation();
+                };
+            } catch (e) {
+                console.error(e);
+                result.innerHTML = "<p style='text-align: center;'>No User Found</p>";
+                result.style.display = "flex";
+            }
+        });
+        if (toggleList) toggleList.addEventListener("click", () => {
+            conversations.classList.toggle("active");
+        });
+        const response = await fetch(`/api/messages/loadopenconversations.php`);
+        const data = await response.json();
+        if (!data.success || !data.conversations || data.conversations.length === 0) {
+            const msg = document.createElement("p");
+            msg.id = "noconv";
+            msg.style.textAlign = "center";
+            msg.textContent = "No conversations yet";
+            conversations.appendChild(msg);
+            chat.innerHTML = "<p>Open a conversation</p>";
+            return;
+        }
+        data.conversations.forEach(conv => {
+            const div = document.createElement("div");
+            div.classList.add("conversation-item");
+            div.innerHTML = `
+                <img src="../content/profiles/${conv.PFP}" alt="Profile Photo">
+                <div>
+                    <strong>${conv.Username}</strong><br>
+                    <small>${conv.LastMessage}</small>
+                </div>
+            `;
+            div.addEventListener("click", () => {
+                currentUserID = conv.UserID;
+                OpenConversation()
+            });
+            conversations.appendChild(div);
+        });
+        chat.innerHTML = "<p>Open a conversation</p>";
+    } catch (e) {
+        console.error("Error loading conversations:", e);
+        conversations.innerHTML = `<p style="text-align:center;">Failed to load conversations.</p>`;
+    }
+}
+
+async function OpenConversation() {
+    const chat = document.getElementById("chatMessages");
+    chat.innerHTML = "";
+    try {
+        const form = new FormData();
+        form.append("UserID", currentUserID);
+        const response = await fetch(`/api/messages/requestmessages.php`, {
+            method: "POST",
+            body: form,
+        });
+        const data = await response.json();
+        if (!data.success) {
+            chat.innerHTML = `<p>Failed to load messages</p>`;
+            return;
+        }
+        if (data.messages.length === 0) {
+            chat.innerHTML = `<p>No messages</p>`;
+            return;
+        }
+        data.messages.forEach(message => {
+            const div = document.createElement("div");
+            if (message.SenderID === uid) {
+                div.classList.add("chat-message", "sent");
+            } else {
+                div.classList.add("chat-message", "received");
+            }
+            div.innerHTML = `
+                ${message.Message}
+                <small style='display: block; font-size: 0.7rem; color: #333333; text-align: right; padding: 0'>${timesince(message.SentAt)}</small>
+            `;
+            chat.appendChild(div);
+        });
+        chat.scrollTop = chat.scrollHeight;
+    } catch (e) {
+        console.error(e);
+        chat.innerHTML = "<p>Failed to load messages</p>";
     }
 }

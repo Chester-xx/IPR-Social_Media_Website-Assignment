@@ -847,6 +847,7 @@ body {
     background: #0f0f0f;
     border: 2px solid #3498db;
     outline: none;
+    color: #ffffff;
   }
   .conversation-header input:hover, .conversation-header:active {
     border-color: #2b83db;
@@ -880,10 +881,16 @@ body {
     height: 400px;
   }
   .chat-message {
-    margin: 0.5rem 0.8rem;
-    padding: 10px;
-    border-radius: 8px;
+    margin: 0.3rem 0.8rem;
+    padding: 4px 8px;
+    border-radius: 5px;
     max-width: 75%;
+    line-height: 1.2;
+    word-wrap: break-word;
+  }
+  .chat-messages p {
+    text-align: center;
+    justify-content: center;
   }
   .chat-message.sent {
     background-color: #3498db;

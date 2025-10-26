@@ -14,7 +14,6 @@
 </head>
 <body>
     <?php PrintHeader(); ?>
-
     <div style="justify-content: center; align-content: center;">
         <a href="../dashboard/followers.php" style="text-decoration: none; color: inherit;">
             <section class="friend-link">
@@ -22,43 +21,16 @@
             </section>
         </a>
     </div>
-
     <div class="messages-page">
         <div class="messaging-area">
-
-            <!-- Toggle button for mobile -->
             <button class="toggle-list" id="toggleList">☰ Conversations</button>
-
-            <!-- Left: Conversations -->
-            <div class="conversations-list" id="conversationsList">
-                <div class="conversation-header">
-                    <input type="text" id="searchBar" placeholder="Search conversations...">
-                </div>
-
-                <div class="conversation-item">
-                    <img src="../uploads/default.png" alt="User PFP">
-                    <div>
-                        <strong>@RetroStar</strong><br>
-                        <small>Last message preview...</small>
-                    </div>
-                </div>
-                <div class="conversation-item">
-                    <img src="../uploads/default.png" alt="User PFP">
-                    <div>
-                        <strong>@NovaUser</strong><br>
-                        <small>Hey, how’s it going?</small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right: Chat -->
+            <div class="conversations-list" id="conversationsList"></div>
             <div class="chat-box" id="chatBox">
                 <div class="chat-messages" id="chatMessages">
-                    <div class="chat-message received">Hey! How are you?</div>
+                    <!-- <div class="chat-message received">Hey! How are you?</div>
                     <div class="chat-message sent">I'm good, just working on a new feature.</div>
-                    <div class="chat-message received">Nice! Can’t wait to see it.</div>
+                    <div class="chat-message received">Nice! Can’t wait to see it.</div> -->
                 </div>
-
                 <div class="chat-input-area">
                     <input type="text" id="chatInput" placeholder="Type your message">
                     <button id="sendMessage">Send</button>
@@ -66,23 +38,42 @@
             </div>
         </div>
     </div>
-
+    <script src="../includes/functions.js"></script>
     <script>
-        const toggleList = document.getElementById("toggleList");
-        const convList = document.getElementById("conversationsList");
-        toggleList.addEventListener("click", () => {
-            convList.classList.toggle("active");
-        });
-
-        const searchBar = document.getElementById("searchBar");
-        searchBar.addEventListener("input", () => {
-            const query = searchBar.value.toLowerCase();
-            const items = document.querySelectorAll(".conversation-item");
-            items.forEach(item => {
-                const name = item.querySelector("strong").textContent.toLowerCase();
-                item.style.display = name.includes(query) ? "flex" : "none";
+    uid = <?php echo $_SESSION["UserID"]; ?>;
+    const send = document.getElementById("sendMessage");
+    const chat = document.getElementById("chatMessages");
+    GetConversations();
+    send.onclick = async () => {
+        const inp = document.getElementById("chatInput");
+        const msg = inp.value.trim();
+        if (!msg || !currentUserID) return;
+        try {
+            const form = new FormData();
+            form.append("ToID", currentUserID);
+            form.append("Message", msg);
+            const response = await fetch(`/api/messages/insertnewmessage.php`, {
+                method: "POST",
+                body: form
             });
-        });
-    </script>
+            const data = await response.json();
+            if (!data.success) {
+                console.error(data.error.message, data.error.code);
+                return;
+            }
+            const div = document.createElement("div");
+            div.classList.add("chat-message", "sent");
+            div.textContent = msg;
+            const time = document.createElement("small");
+            time.textContent = " Just now";
+            div.appendChild(time);
+            chat.appendChild(div);
+            chat.scrollTop = chat.scrollHeight;
+            inp.value = "";
+        } catch (e) {
+            console.error(e);
+        }
+    };
+</script>
 </body>
 </html>

@@ -1,4 +1,5 @@
 <?php
+    // PASSWORD HAS SUCCESSFULLY BEEN RESET PAGE
     include_once("../includes/functions.php");
     StartSesh();
 ?>
@@ -14,6 +15,7 @@
 <body>
     <?php PrintHeader(); ?>
     <div class="page">
+        <!-- Successful password reset -->
         <div class="auth">
             <h1>Success</h1>
             <p>Password changed Successfully</p>

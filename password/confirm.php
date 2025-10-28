@@ -1,6 +1,5 @@
 <?php
-    // We dont check login here because i want a logged in user to be able to use these page to reset their password
-    // the function CheckLogIn redirects users to dashboard if a session ID has been set, which i dont want
+    // PASSWORD RESET CONFIRMATION PAGE
     include_once("../includes/functions.php");
     StartSesh();
 ?>
@@ -19,7 +18,7 @@
         <div class="auth">
             <h1>Confirm Reset</h1> <br>
             <p>A link has been sent to your email.<br>Click on it to reset your password.<br>Time left: <span id="cd"></span></p>
-            <!-- here i added a link for testing, as a mailing server would not work in a localhost instance due to no port forwarding -->
+            <!-- here i added a link for testing, as a mailing server would not work in a localhost instance due to no port forwarding NB!!! -->
             <p>For testing purposes | <a href="/password/reset.php?token=<?php echo(htmlspecialchars($_GET['token']) . "&user=" . htmlspecialchars($_GET["user"])); ?>">Reset Link</a></p>
             <span><a href="/login/index.php">Log In</a> | <a href="/login/regform.php">Sign Up</a></span>
         </div>
@@ -37,12 +36,13 @@
             "i",
             $res
         );
+        // Catch any db errors
         CatchDBError($result);
         // Calc remaining time by subtracting current from expiry
         $expr = strtotime($result->fetch_assoc()["Expires"]) - time();
         if ($expr < 0) $expr = 0;
     ?>
-    <!-- Countdown from 5 minutes -->
+    <!-- Countdown from 5 minutes, update every 1000ms or 1sec -->
     <script>
         let time = <?php echo $expr ?>;
         let cd = setInterval(function() {

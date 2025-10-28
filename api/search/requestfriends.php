@@ -3,7 +3,7 @@
     StartSesh();
     CheckNotLoggedIn();
     header("Content-Type: application/json");
-    // Get all friend data from sed user
+    // Get friends list and friend specific data from sed user
     $result = RunQuery(
         null,
         "Select u.UserID, u.Username, u.PFP From `tblUsers` u  Inner Join `tblFollowers` f On u.UserID = f.UserFollowerID Where f.UserID = ?",
@@ -19,7 +19,7 @@
         exit();
     }
     $list = [];
-    // append each user, xss prevent username as it will be outputted
+    // Append each user, xss prevent username as it will be outputted
     while ($row = $result->fetch_assoc()) {
         $list[] = ["UserID" => $row["UserID"], "Username" => htmlspecialchars($row["Username"], ENT_QUOTES, "UTF-8"), "PFP" => $row["PFP"]];
     }

@@ -1,10 +1,17 @@
 <?php
     // --- CONSTANTS ---
+        // the current working directory to profile photos
     define("PFP", __DIR__ . "/../content/profiles/");
+        // the current working directory to posts
     define("POST", __DIR__ . "/../content/posts/");
+        // The valid file extension uploads for posts
     define("ACCEPTED_FILES", ["jpg", "jpeg", "png", "webp", "gif", "webm", "mp4", "mov"]);
+        // the valid profile image extension uploads
     define("ACCEPTED_PFP", ["jpg", "jpeg", "png", "webp"]);
     // --- CONSTANTS END ---
+
+    // Setting time zone so that password reset timestamps work correctly
+    date_default_timezone_set("Africa/Johannesburg");
 
     function Error(string $error, string $message, bool $pure_text = false): void {
         // tests if an error of '$error' exists from GET and outputs the specified message
@@ -97,12 +104,15 @@
             if ($closeconn) $connection->close();
             return $result;
         } catch (Exception $e) {
+            // API style response for ease of use with CatchDBError
             return ["success" => false, "error" => ["message" => $e->getMessage(), "code" => $e->getCode()]];
         }
     }
 
     function CatchDBError(mixed $Result, bool $APICALL = false): bool {
+        // Used to modularize databasae error catching
         // I choose whether to assign the return value, if its under my use case
+        // APICALL ensures that no redirections are made, as i send json instead with the error
         if ($APICALL) {
             if (is_array($Result) && array_key_exists("error", $Result)) {
                 return true;
@@ -117,6 +127,7 @@
 
     function CheckQueryResult(mysqli_result | bool $result, mysqli_stmt | bool $statement, mysqli | bool $connection, string $message): void {
         // checks if a queried result exists, if NOT frees resources and redirects to the desired page
+        // Useful for checking if something exists, we want to see a result or many
         if ($result->num_rows < 1) {
             $statement->close();
             $result->free();
@@ -128,6 +139,7 @@
 
     function CheckNoQueryResult(mysqli_result | bool $result, mysqli_stmt | bool $statement, mysqli | bool $connection, string $message): void {
         // checks if a queried result DOES NOT EXIST, if it does exist frees resources and redirects to the desired page
+        // Useful for checking if a username doesnt exist for example, we dont want to see any results
         if ($result->num_rows > 0) {
             $statement->close();
             $result->free();
@@ -138,7 +150,8 @@
     }
 
     function CheckChangeFail(mysqli_stmt | bool $statement, mysqli | bool $connection, string $message): void {
-        // checks if insertion OR update to the database has failed
+        // checks if insertion OR update OR deletion to the database has failed
+        // An insertion, deletion or update returns the affected rows like so
         if ($statement->affected_rows < 1) {
             $statement->close();
             $connection->close();

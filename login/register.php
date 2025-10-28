@@ -2,39 +2,40 @@
     include_once("../includes/functions.php");
     StartSesh();
     CheckLogIn();
-    // did the user get redirected to this page via regform post
+    // Did the user get redirected to this page via regform post
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
-        // passed values are not set
+        // Passed values are not set
         if (!isset($_POST["reg_email"], $_POST["reg_username"], $_POST["reg_password"], $_POST["reg_confirm"], $_POST["reg_name"])) {
             header("Location: /login/regform.php?error=nocredentials");
             exit();
         }
-        // passed values are set but empty strings
+        // Passed values are set but empty strings
         else if (empty($_POST["reg_email"]) || empty($_POST["reg_username"]) || empty($_POST["reg_password"]) || empty($_POST["reg_confirm"]) || empty($_POST["reg_name"])) {
             header("Location: /login/regform.php?error=nocredentials");
             exit();
         }
-        // declare vars
+        // Declare vars and sanitize input
         $email = trim(filter_input(INPUT_POST, "reg_email", FILTER_SANITIZE_EMAIL));
         $username = trim(filter_input(INPUT_POST, "reg_username", FILTER_SANITIZE_FULL_SPECIAL_CHARS));
         $name = trim(filter_input(INPUT_POST, "reg_name", FILTER_SANITIZE_FULL_SPECIAL_CHARS));
         $password = trim(filter_input(INPUT_POST, "reg_password", FILTER_DEFAULT));
         $check = trim(filter_input(INPUT_POST, "reg_confirm", FILTER_DEFAULT));
-        // is the email valid
+        // Is the email valid
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             header("Location: /login/regform.php?error=invalidemail");
             exit();
         }
+        // Is the username atleast 3 characters long
         if (strlen($username) < 3) {
             header("Location: /login/regform.php?error=usernameshort");
             exit();
         }
-        // are the passwords atleast 8 characters in length
+        // Are the passwords atleast 8 characters in length
         if (strlen($password) < 8 || strlen($check) < 8) {
             header("Location: /login/regform.php?error=passwordshort");
             exit();
         }
-        // are the passwords equivelant
+        // Are the passwords equivelant
         if ($password !== $check) {
             header("Location: /login/regform.php?error=passwordmatch");
             exit();
@@ -49,6 +50,7 @@
             "s",
             $email
         );
+        // Catch any db errors
         CatchDBError($result);
         // Get unique username for checking
         $result = $result = RunQuery(
@@ -59,10 +61,11 @@
             "s",
             $username
         );
+        // Catch any db errors
         CatchDBError($result);
-        // hash password with default algo, insert into db
+        // Hash password with default algo SHA 256, insert into db
         $hash = password_hash($password, PASSWORD_DEFAULT);
-        // insert new user data
+        // Insert new user data
         $tmp = RunQuery(
             $conn,
             "Insert Into `tblUsers` (`Email`, `Username`, `FullName`, `Password`) Values (?, ?, ?, ?)",
@@ -71,9 +74,11 @@
             "ssss",
             $email, $username, $name, $hash
         );
+        // Catch any db errors
         CatchDBError($tmp);
+        // Get user id
         $uid = $conn->insert_id;
-        // one time access flag for createsuccess.php
+        // One time access flag for createsuccess.php on redirection
         $_SESSION["acc_created"] = true;
         $conn->close();
         header("Location: /login/success.php?id=$uid");

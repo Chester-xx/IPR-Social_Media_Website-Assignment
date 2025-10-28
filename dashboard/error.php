@@ -1,4 +1,6 @@
 <?php
+    // DASHBOARD ERROR PAGE
+    // Here i display general errors that could occur as a seperate html page to the user
     include_once("../includes/functions.php");
     StartSesh();
     CheckNotLoggedIn();
@@ -15,7 +17,9 @@
 <body style="text-align: center;">
     <?php 
         PrintHeader();
+        // Specific to this line below: i get the username that was searched for and state that it does not exist
         if (isset($_GET["Username"])) Error("nouser", "User '" . htmlspecialchars($_GET["Username"], ENT_QUOTES, "UTF-8") . "' Does Not Exist");
+        // Call helper on all specific errors outlined as the first parameter
         Error("dbfail", "Failed to communicate with the database, database connection failure");
         Error("file", "Failed to access uploaded file, please try again");
         Error("filesize", "Uploaded file is too large, please ensure the image is less than 15MB");
@@ -25,6 +29,7 @@
         Error("nostate", "Invalid follow action");
     ?>
     <br><br>
+    <!-- Redirect button back to dashboard -->
     <a href="../dashboard/" style="color: white;">Menu</a>
 </body>
 </html>

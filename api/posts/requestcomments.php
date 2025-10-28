@@ -2,11 +2,10 @@
     include_once("../../includes/functions.php");
     StartSesh();
     CheckNotLoggedIn();
-
     header("Content-Type: application/json");
-
+    // Get post id from Get method
     $pid = $_GET["PostID"] ? intval($_GET["PostID"]) : 0;
-
+    // Check if the post id is valid or not
     if ($pid === 0) {
         http_response_code(403);
         echo(json_encode(["success" => false, "error" => ["message" => "Post ID not set: ", "code" => 403]]));
@@ -33,12 +32,12 @@
         echo(json_encode($result));
         exit();
     }
-
     $list = [];
-
+    // XSS prevention
     while ($row = $result->fetch_assoc()) {
         $safe = [];
         foreach ($row as $key => $value) {
+            // Escape characters to prevent xss if its a string
             if (is_string($value)) {
                 $safe[$key] = htmlspecialchars($value, ENT_QUOTES, "UTF-8");
             } else {

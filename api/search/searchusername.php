@@ -3,7 +3,7 @@
     StartSesh();
     CheckNotLoggedIn();
     header("Content-Type: application/json");
-    // Get sent Get value for username
+    // Get username query from Get method, this will be compared with %qry% so anything containing the query will be sent, limited to 5 results
     $qry = isset($_GET["query"]) ? htmlspecialchars(trim($_GET["query"]), ENT_QUOTES, "UTF-8") : "";
     // Check empty query
     if (empty($qry)) {
@@ -26,7 +26,7 @@
         exit();
     }
     $list = [];
-    // append each user, xss prevent username as it will be outputted
+    // Append each user, xss prevent username as it will be outputted
     while ($row = $result->fetch_assoc()) {
         $list[] = ["Username" => htmlspecialchars($row["Username"], ENT_QUOTES, "UTF-8"), "PFP" => $row["PFP"]];
     }

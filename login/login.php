@@ -2,12 +2,12 @@
     include_once("../includes/functions.php");
     StartSesh();
     CheckLogIn();
-    // request method post for processing login
+    // Request method post for processing login
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
-        // sanitize input and trim
+        // Sanitize input and trim
         $email = trim(filter_input(INPUT_POST, "login_email", FILTER_SANITIZE_EMAIL));
         $password = trim(filter_input(INPUT_POST, "login_password", FILTER_DEFAULT));
-        // validate email
+        // Validate email
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             header("Location: /login/index.php?error=invalid");
             exit();
@@ -26,24 +26,25 @@
             "s",
             $email
         );
+        // Catch any db errors
         CatchDBError($result);
-        // get user ID and hashed password
+        // Get user ID and hashed password
         $data = $result->fetch_assoc();
         $uid = $data["UserID"];
         $hash = $data["Password"];
-        // if passwords dont match verification
+        // If passwords dont match verification
         if (!password_verify($password, $hash)) {
             header("Location: /login/index.php?error=invalid");
             exit();
         }
         $result->free();
-        // set session ID stating logged in
+        // Set session ID stating logged in
         $_SESSION["UserID"] = $uid;
-        // redirect finally
+        // Redirect finally
         header("Location: /dashboard/");
         exit();
     } else {
-        // user tried to access page via get/entering the url specifically
+        // User tried to access page via get/entering the url specifically
         header("Location: /login/");
         exit();
     }

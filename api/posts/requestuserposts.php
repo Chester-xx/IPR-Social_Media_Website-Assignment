@@ -1,16 +1,16 @@
 <?php
     include_once("../../includes/functions.php");
-    // specify packet header for json access
     header("Content-Type: application/json");
     StartSesh();
     CheckNotLoggedIn();
-    // uid - 400 err specifies bad request
+    // Define bad request, as in user error (my own code faultiness) from API call
     $BadReq = false;
+    // Get user id from Get method
     $uid = isset($_GET["uid"]) ? intval($_GET["uid"]) : 0;
     if ($uid === 0) $BadReq = true;
-    // how many posts we will send at once
+    // Define how many posts we will send at once
     $loadlimit = 10;
-    // the position of posts in the db
+    // Get the offset position of user specific posts, ie 10 to 20
     $offset = isset($_GET["offset"]) ? intval($_GET["offset"]) : 0;
     // Get user specific posts of account - so long that its not a bad request
     if (!$BadReq) {
@@ -31,25 +31,26 @@
             $_SESSION["UserID"], $uid, $loadlimit, $offset
         );
     }
-    // catch exceptions
+    // Catch exceptions
     if ((is_array($result) && array_key_exists("error", $result) && CatchDBError($result, true)) || $BadReq) {
-        // response 500 refers to a server side http response code, access failure
+        // Response 500 refers to a server side http response code, access failure
         http_response_code($BadReq ? 400 : 500);
-        // send failed request as a json with the errors
+        // Send failed request as a json with the errors
         echo(json_encode($BadReq ? ["success" => false, "error" => ["message" => "User ID not specified - Bad request", "code" => 400]] : $result));
         exit();
     }
     $list = [];
-    // append fetch to array
-    // XSS PREVENTION ASWELL HERE
+    // Append fetch to array
+    // Xss prevention
     while ($row = $result->fetch_assoc()) {
         $safe = [];
         foreach ($row as $key => $value) {
+            // If the key pair is a string, Escape characters to prevent xss, otherwise just parse value itself
             $safe[$key] = is_string($value) ? htmlspecialchars($value, ENT_QUOTES, "UTF-8") : $value;
         }
         $list[] = $safe;
     }
-    // send data - count < loadlimit means theres no more posts
+    // Send data - count < loadlimit means theres no more posts
     echo(json_encode(["success" => true, "posts" => $list, "continue" => count($list) === $loadlimit]));
     $result->free();
 ?>

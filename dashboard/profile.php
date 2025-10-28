@@ -1,9 +1,11 @@
 <?php
+    // PROFILE PAGE FOR BOTH THE LOGGED IN USER AND FOR ACCOUNTS THEY VISIT
     include_once("../includes/functions.php");
     StartSesh();
     CheckNotLoggedIn();
-    // conn as we have multiple queries
+    // Conn as we have multiple queries
     $conn = DBSesh();
+    // State to check if the user can access certain features or not
     $IS_OWN_PAGE = true;
     $DBUSER = null;
     // Get viewer info from db
@@ -15,12 +17,13 @@
         "i",
         $_SESSION["UserID"]
     );
+    // Catch any db errors
     CatchDBError($result1);
-    // Profile via search
+    // Profile via search, meaning a username was specified in the url/Get method
     if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET["Username"])) {
-        // Get username to view
+        // Get username to view and escape characters
         $username = htmlspecialchars(trim($_GET["Username"]), ENT_QUOTES, "UTF-8");
-        // get user data specific to username
+        // Get user data specific to username
         $result2 = RunQuery(
             $conn,
             "Select `UserID`, `Username`, `PFP` From `tblUsers` Where `Username` = ?",
@@ -40,7 +43,7 @@
         $uid = $DBUSER["UserID"];
     }
     $followstate = "";
-    // set USER DATA (for viewing) & VIEWER DATA (for comments and likes)
+    // Set USER DATA (for viewing) & VIEWER DATA (for comments and likes)
     if ($IS_OWN_PAGE) {
         $udata = $result1->fetch_assoc();
         $vdata = $udata;
@@ -73,6 +76,7 @@
                 "ii",
                 $vdata["UserID"], $udata["UserID"]
             );
+            // Catch any db errors
             CatchDBError($result);
             // User either requested to follow or doesnt follow at all
             if ($result->num_rows == 1) {
@@ -93,6 +97,7 @@
         "i",
         $udata["UserID"]
     );
+    // Catch any db errors
     CatchDBError($result);
     // Get friend count
     $friendcount = $result->fetch_assoc()["Friends"];
@@ -110,18 +115,24 @@
 <body>
     <?php
         PrintHeader();
+        // Error output to user
         Error("nouser", "User Does Not Exist");
         Error("dbfail", "Failed to communicate with the database");
     ?>
     <div class="profile-page-cont">
         <div class="profile-cont">
             <div class="profile-info">
+                <!-- Profile photo - either specified or default pfp -->
                 <img src="<?php echo("../content/profiles/" . (file_exists(__DIR__ . "/../content/profiles/" . $udata["PFP"]) ? $udata["PFP"] : "default.jpg")); ?>" alt="Profile Photo">
                 <div class="profile-details">
+                    <!-- Username -->
                     <h2><?php echo($udata["Username"]); ?></h2>
+                    <!-- Specific to USER PAGE OR NOT -->
                     <?php
                         if ($IS_OWN_PAGE) {
+                            // Link to followers page
                             echo("<p><a href='../dashboard/followers.php' class='noline'>");
+                            // Display of followers method
                             if ($friendcount < 1) {
                                 echo('No Friends');
                             } else if ($friendcount == 1) {
@@ -131,6 +142,7 @@
                             }
                             echo("</a></p>");
                         } else {
+                            // Not users account page
                             echo("<p>");
                             if ($friendcount < 1) {
                                 echo('No Friends');
@@ -142,21 +154,23 @@
                             echo("</p>");
                         }
                     ?>
-
                 </div>
             </div>
             <div class="profile-btn">
-                <?php 
-                echo($IS_OWN_PAGE ? 
-                    "<a href='../dashboard/options.php'><button>Edit Profile</button></a>" : 
-                    "<a href='../users/follow.php?uid=" . $udata["UserID"] . "&state=" . $followstate . "'>
-                        <button style='Background: " . $btncolor . "'>" . $followstate . "</button>
-                    </a>"); ?>
+                <?php
+                    // Either show an edit profile button or follow/request/unfollow button
+                    echo($IS_OWN_PAGE ? 
+                        "<a href='../dashboard/options.php'><button>Edit Profile</button></a>" : 
+                        "<a href='../users/follow.php?uid=" . $udata["UserID"] . "&state=" . $followstate . "'>
+                            <button style='Background: " . $btncolor . "'>" . $followstate . "</button>
+                        </a>"); 
+                ?>
                 <a href="../dashboard/"><button>Home</button></a>
             </div>
         </div>
         <!-- Create Post -->
         <?php
+            // Allow the user to post on their profile page aswell
             if ($IS_OWN_PAGE) {
                 echo('
                     <form action="createpost.php" method="post" enctype="multipart/form-data">
@@ -191,8 +205,8 @@
         APICALL = 1;
 
         // --- Event Bindings ---
-            // Clicks for each file upload action && Preview handler only if IS_OWN_PAGE
         <?php
+            // Clicks for each file upload action && Preview handler only if IS_OWN_PAGE
             if ($IS_OWN_PAGE) {
                 echo('
                     const actions = ["post_upload_image", "post_upload_gif", "post_upload_video"];
@@ -205,7 +219,7 @@
                 );
             }
         ?>
-            // Post Loading
+            // Post Loading, if the user reaches the end of the page, load more posts via API
         window.addEventListener("scroll", function() {
             Scroll();
         });

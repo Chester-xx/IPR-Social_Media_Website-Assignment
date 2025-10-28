@@ -2,6 +2,7 @@
     include_once("../../includes/functions.php");
     StartSesh();
     CheckNotLoggedIn();
+    // Specify packet header for json access
     header("Content-Type: application/json");
     // Get uid
     $uid = isset($_POST["ToID"]) ? intval($_POST["ToID"]) : 0;

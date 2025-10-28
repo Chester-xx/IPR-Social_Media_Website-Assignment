@@ -1,4 +1,5 @@
 <?php
+    // SIGN UP | REGISTRATION PAGE
     include_once("../includes/functions.php");
     StartSesh();
     CheckLogIn();
@@ -17,27 +18,35 @@
     <div class="page">
         <div class="auth">
             <h1>Create an Account</h1> <br>
+            <!-- Form for submitting email, username, full name, password and password repeat -->
             <form action="register.php" method="post">
+                <!-- Email -->
                 <input type="email" name="reg_email" id="reg_email" placeholder="&#9993; Email" required>
                 <?php 
                     Error("invalidemail", "Invalid Email"); 
                     Error("emailexists", "An account is already registered with the provided email");
                 ?>
+                <!-- Full Name -->
                 <input type="text" name="reg_name" id="reg_name" placeholder="&#129534; Full Name" required>
+                <!-- Username -->
                 <input type="text" name="reg_username" id="reg_username" placeholder="&#9906; Username" required>
                 <?php 
                     Error("usernameexists", "An account is already using that username");
                     Error("usernameshort", "Username must include 3 or more characters");
                 ?>
+                <!-- Password -->
                 <input type="password" name="reg_password" id="reg_password" placeholder="&#128274; Password" required>
                 <?php
                     Error("passwordshort", "Password must contain atleast 8 characters");
                     Error("passwordmatch", "Passwords don't match");
                 ?>
+                <!-- Repeat Password -->
                 <input type="password" name="reg_confirm" id="reg_confirm" placeholder="&#10003; Confirm Password" required>
                 <?php Error("nocredentials", "Please fill in all fields"); ?>
                 <?php Error("dbfail", "Failed to create account, database connection failure"); ?> <br>
+                <!-- Form submission -->
                 <button type="submit">Sign Up</button> <br>
+                <!-- Other option to log in -->
                 <span>Have an account? <a href="/login/index.php">Log In</a></span>
             </form>
         </div>

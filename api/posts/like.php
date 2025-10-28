@@ -1,6 +1,5 @@
 <?php
     include_once("../../includes/functions.php");
-    // specify packet header for json access
     header("Content-Type: application/json");
     StartSesh();
     CheckNotLoggedIn();

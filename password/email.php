@@ -1,4 +1,5 @@
 <?php
+    // EMAIL INPUT FOR PASSWORD RESET PAGE
     include_once("../includes/functions.php");
     StartSesh();
 ?>
@@ -16,14 +17,17 @@
     <div class="page">
         <div class="auth">
             <h1>Forgot Your Password?</h1> <br>
+            <!-- Form to enter email -->
             <form action="/password/process.php" method="post">
                 <input type="email" name="email" id="email" placeholder="&#9993; Enter your email" required> <br>
                 <?php 
+                    // Error outputs to user
                     Error("invalid", "Invalid email entered");
                     Error("noemail", "Email is not linked to a user account");
                     Error("dbfail", "Failed to connect to the database");
                     Error("expired", "Your request has expired, please try again");
                 ?>
+                <!-- Button to submit form -->
                 <button type="submit">Reset Password</button> <br> <br>
                 <span><a href="/login/index.php">Log In</a> | <a href="/login/regform.php">Sign Up</a></span>
             </form>

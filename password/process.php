@@ -1,11 +1,12 @@
 <?php
+    // Process password reset email input
     include_once("../includes/functions.php");
     StartSesh();
     // Only allow post
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
         // sanitize and trim email input
         $email = trim(filter_input(INPUT_POST, "email", FILTER_SANITIZE_EMAIL));
-        // filter validate email
+        // Filter validate email
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             header("Location: /password/email.php?error=invalid");
             exit();
@@ -20,8 +21,9 @@
             "s",
             $email
         );
+        // Catch any db errors
         CatchDBError($result);
-        // no user found - custom function from ExpectedResult
+        // No user found - custom function from ExpectedResult
         if ($result->num_rows < 1) {
             $conn->close();
             header("Location: /password/email.php?error=noemail");
@@ -29,7 +31,7 @@
         }
         // Get ID for querying in reset.php
         $uid = $result->fetch_assoc()["UserID"];
-        // generate a token for url, hash and an expr date for db - this contained unreadable text so i used binary to hexidecimal
+        // Generate a token for url, hash and an expr date for db - this contained unreadable text so i used binary to hexidecimal
         $token = bin2hex(random_bytes(6));
         $hash = password_hash($token, PASSWORD_DEFAULT);
         $exp = date("Y-m-d H:i:s", strtotime("+5 minutes"));
@@ -42,19 +44,20 @@
             "sss",
             $email, $hash, $exp
         );
+        // Catch any db errors
         CatchDBError($result);
-        // get the newly entered ResetID from execution
+        // Get the newly entered ResetID from execution
         $res = $conn->insert_id;
         $conn->close();
-        // send email with link - WILL MOST LIKELY NOT WORK WITH NO PORT FORWARDING as localhosted server
+        // Send email with link - WILL MOST LIKELY NOT WORK WITH NO PORT FORWARDING as localhosted server
         $reset = "http://localhost/password/reset.php?token=$token";
         $msg = "You requested to reset your @Connect password. Click on the link below to reset it\n" . $reset . "\nIf you did not request this, ignore this email.";
         mail($email, "Password Reset Request", $msg, "From: no-reply@connect.co.za\r\n");
-        // redirect
+        // Redirect
         header("Location: /password/confirm.php?token=$token&user=$uid&reset=$res");
         exit();
     } else {
-        // user tried to access page via get
+        // User tried to access page via get
         header("Location: /login/index.php");
         exit();
     }

@@ -1,8 +1,9 @@
 <?php
+    // MAIN PAGE FOR DASHBOARD - ALL POSTS ARE SHOWN HERE ASWELL AS FOLLOWER POSTS
     include_once("../includes/functions.php");
     StartSesh();
     CheckNotLoggedIn();
-    // Get profile photo name
+    // Get profile photo name and username of logged in user
     $result = RunQuery(
         null,
         "Select `PFP`, `Username` From `tblUsers` Where `UserID` = ?",
@@ -11,13 +12,16 @@
         "i",
         $_SESSION["UserID"]
     );
+    // Catch any db errors
     CatchDBError($result);
     // Create web path for loading into src
     $data = $result->fetch_assoc();
+    // Set path for source display
     $path = "../content/profiles/" . $data["PFP"];
+    // Set path for profile photo name
     $upfp = $data["PFP"];
     $username = $data["Username"];
-    // Check if the file exists, otherwise display default
+    // Check if the file exists, otherwise display default profile photo image
     if (!file_exists(__DIR__ . "/../content/profiles/" . $data["PFP"])) {
         $path = "../content/profiles/default.jpg";
     }
@@ -124,6 +128,7 @@
         // --- Function Calls ---
             // Friend Posts Tab
         followingbtn.addEventListener("click", () => {
+            // ensure only the friends posts are loaded in this formation
             following = true;
             followingbtn.classList.add("active");
             recentbtn.classList.remove("active");
@@ -131,10 +136,12 @@
             offset = 0;
             loading = false;
             cont = true;
+            // specific call
             GetNewPosts(2);
         });
             // Recent Posts Tab
         recentbtn.addEventListener("click", () => {
+            // ensure only recent posts are loaded in this formation
             following = false;
             recentbtn.classList.add("active");
             followingbtn.classList.remove("active");
@@ -142,8 +149,10 @@
             offset = 0;
             loading = false;
             cont = true;
+            // specific call
             GetNewPosts(0);
         });
+        // Call API to load newest posts
         GetNewPosts(0);
     </script>
 </body>

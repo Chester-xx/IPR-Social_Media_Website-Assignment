@@ -1,4 +1,5 @@
 /* All the styling characteristics for the frontend */
+/* --- GENERAL --- */
 html {
   background: #000000;
 }
@@ -22,6 +23,7 @@ body {
   background-color: inherit;
   text-decoration: none;
 }
+/* --- GENERAL --- */
 
 /* --- HEADER --- */
   header {

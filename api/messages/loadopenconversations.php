@@ -7,7 +7,7 @@
     // I collect each individual conversation where either the user is a message sender or reciever
     // I get the latest message from either side for a preview
     // I return the other user info (not the logged in users) PFP and username
-    // And then descending basically meaning the conversations are top to bottom newest
+    // And then descending basically meaning the conversations are top to bottom newest, so all conversations
     $result = RunQuery(
         null,
         "Select u.UserID, u.Username, u.PFP, m.Message As `LastMessage`, m.SentAt As LastDate

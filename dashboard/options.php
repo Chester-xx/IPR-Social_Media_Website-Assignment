@@ -1,4 +1,5 @@
 <?php
+    // USER SETTINGS PAGE
     include_once("../includes/functions.php");
     StartSesh();
     CheckNotLoggedIn();
@@ -16,23 +17,28 @@
     <?php PrintHeader(); ?>
     <div class="options-page">
         <div class="options-container">
+            <!-- Options list -->
             <h1>Account Options</h1>
             <?php Error("dbfail", "Failed to connect to the database"); ?>
+            <!-- Username change -->
             <form class="option-form" action="../users/changeusername.php" method="post">
                 <label for="username"><strong>Change Username</strong></label>
                 <input type="text" id="username" name="username" placeholder="Enter new username" required>
                 <?php
+                    // Error handling
                     Error("usernameshort", "Username must include 3 or more characters");
                     Error("userexists", "Username is already taken");
                     Error("empty", "Please fill in the username field");
                 ?>
                 <button type="submit">Save</button>
             </form>
+            <!-- Profile photo change -->
             <form id="photo-form" class="option-form" method="post" action="../users/changepfp.php" enctype="multipart/form-data">
                 <input type="hidden" name="photo-form" value="1">
                 <label for="pfp">Change Profile Photo</label>
                 <input type="file" id="pfp" name="pfp" accept=".jpg, .jpeg, .png, .webp" required hidden>
                 <?php
+                    // Error handling
                     Error("fileupload", "Failed to change profile photo, please try again");
                     Error("filesize", "Please upload an image smaller than 10MB");
                     Error("imageext", "Please upload a valid image");
@@ -40,10 +46,12 @@
                 <button id="upload-img" type="button">Upload</button>
             </form>
             <hr class="divider">
+            <!-- Log Out button -->
             <form class="option-form" action="../logout.php" method="post">
                 <label>Log Out</label>
                 <button type="submit">Log Out</button>
             </form>
+            <!-- Delete Account button -->
             <form class="option-form danger" action="../users/deleteaccount.php" method="post" onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone')">
                 <?php Error("deletefail", "Failed to delete your account, please try again"); ?>
                 <label>Delete Account</label>
@@ -52,24 +60,33 @@
         </div>
     </div>
     <script>
+        // Profile photo js handle before form submission
+        // Here i chose to handle file uploads before submitting the form
         const btn = document.getElementById("upload-img");
         const fileh = document.getElementById("pfp");
+        // On uploading an image via the button option
         btn.addEventListener("click", () => {
+            // Initiate hidden input via click
             fileh.click();
         });
+        // On the file change do checks
         fileh.addEventListener("change", () => {
+            // Get the file
             const file = fileh.files[0];
             if (!file) return;
+            // Check that the files are in an allowed array list
             if (!["image/jpeg", "image/png", "iamge/webp"].includes(file.type)) {
                 alert("Invalid file uploaded, only jpg, jpeg, png or webp accepted");
                 fileh.value = "";
                 return;
             }
+            // Check that the profile photos arent above 10MB
             if (file.size > 10 * 1024 * 1024) {
                 alert("Uploaded image is too big, please upload an image smaller than 10MB");
                 fileh.value = "";
                 return;
             }
+            // Submit the form
             document.getElementById("photo-form").submit();
         });
     </script>

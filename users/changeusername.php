@@ -1,4 +1,5 @@
 <?php
+    // Change a users usernames
     include_once("../includes/functions.php");
     StartSesh();
     CheckNotLoggedIn();
@@ -9,6 +10,7 @@
         header("Location: /dashboard/options.php?error=empty");
         exit();
     }
+    // Check the new username is 3 or more characters
     if (strlen($username) < 3) {
         header("Location: /dashboard/options.php?error=usernameshort");
         exit();
@@ -23,6 +25,7 @@
         "s",
         $username
     );
+    // Catch any db errors
     CatchDBError($result);
     // Check no usernames are the same
     if ($result->num_rows > 0) {
@@ -39,6 +42,7 @@
         "si",
         $username, $_SESSION["UserID"]
     );
+    // Catch any db errors
     CatchDBError($result);
     $conn->close();
     header("Location: ../dashboard/profile.php");
